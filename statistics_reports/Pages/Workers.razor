@@ -1,0 +1,176 @@
+﻿@page "/workers"
+
+@using statistics_reports.Services
+@using statistics_reports.Models
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+
+<h3>Работники</h3>
+
+@if (!SessionChecked)
+{
+    <p>Проверка входа...</p>
+}
+else if (!SupabaseSession.IsAuthenticated)
+{
+    <div class="alert alert-warning">
+        Вы не авторизованы. Пожалуйста, войдите в систему.
+    </div>
+    <button class="btn btn-primary" @onclick="GoToLogin">Перейти на страницу входа</button>
+}
+else if (IsLoading)
+{
+    <p>Загрузка...</p>
+}
+else if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+else
+{
+    <button class="btn btn-success mb-3" @onclick="ShowAddForm">
+        Добавить работника
+    </button>
+
+    @if (ShowForm)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="mb-2">
+                    <label class="form-label">Имя</label>
+                    <input class="form-control" @bind="NewName" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Nr</label>
+                    <input class="form-control" @bind="NewNr" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Arbeitsplatz</label>
+                    <input class="form-control" @bind="NewArbeitsplatz" />
+                </div>
+                <button class="btn btn-primary me-2" @onclick="OnAddWorker">Сохранить</button>
+                <button class="btn btn-secondary" @onclick="HideAddForm">Отмена</button>
+            </div>
+        </div>
+    }
+
+    @if (WorkersList.Count == 0)
+    {
+        <p>Пока нет ни одного работника.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Имя</th>
+                    <th>Nr</th>
+                    <th>Arbeitsplatz</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var w in WorkersList)
+                {
+                    <tr>
+                        <td>@w.Id</td>
+                        <td>@w.Name</td>
+                        <td>@w.Nr</td>
+                        <td>@w.Arbeitsplatz</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private List<Worker> WorkersList { get; set; } = new();
+
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private bool ShowForm { get; set; }
+    private string NewName { get; set; } = string.Empty;
+    private string NewNr { get; set; } = string.Empty;
+    private string NewArbeitsplatz { get; set; } = string.Empty;
+
+    // Флаг, что мы уже один раз проверили сессию (InitializeAsync)
+    private bool SessionChecked { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Инициализируем сессию (если ещё нет) — читаем токен из localStorage
+        await SupabaseSession.InitializeAsync();
+        SessionChecked = true;
+
+        // 2. Если уже есть токен — грузим работников
+        if (SupabaseSession.IsAuthenticated)
+        {
+            await LoadWorkersAsync();
+        }
+    }
+
+    private async Task LoadWorkersAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+
+        try
+        {
+            WorkersList = await SupabaseClient.GetWorkersAsync();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void ShowAddForm()
+    {
+        ShowForm = true;
+        NewName = string.Empty;
+        NewNr = string.Empty;
+        NewArbeitsplatz = string.Empty;
+    }
+
+    private void HideAddForm()
+    {
+        ShowForm = false;
+    }
+
+    private async Task OnAddWorker()
+    {
+        if (string.IsNullOrWhiteSpace(NewName) ||
+            string.IsNullOrWhiteSpace(NewNr) ||
+            string.IsNullOrWhiteSpace(NewArbeitsplatz))
+        {
+            ErrorMessage = "Заполните все поля.";
+            return;
+        }
+
+        try
+        {
+            var created = await SupabaseClient.InsertWorkerAsync(NewName, NewNr, NewArbeitsplatz);
+            if (created != null)
+            {
+                WorkersList.Add(created);
+                HideAddForm();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+
+    private void GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

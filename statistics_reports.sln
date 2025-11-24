@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.36426.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "statistics_reports", "statistics_reports\statistics_reports.csproj", "{72F283C9-6670-4A08-9A18-8181AE27C09B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72F283C9-6670-4A08-9A18-8181AE27C09B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F283C9-6670-4A08-9A18-8181AE27C09B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F283C9-6670-4A08-9A18-8181AE27C09B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F283C9-6670-4A08-9A18-8181AE27C09B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
