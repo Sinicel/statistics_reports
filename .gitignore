@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Логи
+logs/
+statistics_reports/logs/
+
+# Лишняя вложенная папка публикации (если вдруг ещё раз появится)
+statistics_reports/render_publish/render_publish/
