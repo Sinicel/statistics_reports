@@ -1,0 +1,413 @@
+﻿@page "/statistics"
+
+@using statistics_reports.Services
+@using statistics_reports.Models
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+
+<h3>Статистика</h3>
+
+@if (!SessionChecked)
+{
+    <p>Проверка входа...</p>
+}
+else if (!SupabaseSession.IsAuthenticated)
+{
+    <div class="alert alert-warning">
+        Вы не авторизованы. Пожалуйста, войдите в систему.
+    </div>
+    <button class="btn btn-primary" @onclick="GoToLogin">Перейти на страницу входа</button>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+
+    <!-- ФИЛЬТР -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>Фильтр</h5>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Nr сотрудника</label>
+                    <input class="form-control"
+                           @oninput="OnFilterWorkerNrInput"
+                           value="@FilterWorkerNr" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Работник (по имени)</label>
+                    <select class="form-select"
+                            value="@FilterWorkerIdString"
+                            @onchange="OnFilterWorkerSelectChanged">
+                        <option value="">Все</option>
+                        @foreach (var w in WorkersList)
+                        {
+                            <option value="@w.Id">@w.Name (@w.Nr)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">С даты</label>
+                    <input class="form-control" type="date" @bind="FromDate" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">По дату</label>
+                    <input class="form-control" type="date" @bind="ToDate" />
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button class="btn btn-secondary w-100" @onclick="OnApplyFilter">
+                        Применить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ДОБАВИТЬ ЗАПИСЬ -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>Добавить запись</h5>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Nr сотрудника</label>
+                    <input class="form-control"
+                           @oninput="OnNewWorkerNrInput"
+                           value="@NewWorkerNr" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Работник (по имени)</label>
+                    <select class="form-select"
+                            value="@NewWorkerIdString"
+                            @onchange="OnNewWorkerSelectChanged">
+                        <option value="">-- выбрать --</option>
+                        @foreach (var w in WorkersList)
+                        {
+                            <option value="@w.Id">@w.Name (@w.Nr)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Дата</label>
+                    <input class="form-control" type="date" @bind="NewWorkDate" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Количество (Menge)</label>
+                    <input class="form-control" type="number" @bind="NewMenge" />
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button class="btn btn-success w-100" @onclick="OnAddStatistic">
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТАБЛИЦА -->
+    @if (IsLoading)
+    {
+        <p>Загрузка статистики...</p>
+    }
+    else if (StatisticsList.Count == 0)
+    {
+        <p>Записей не найдено.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Работник</th>
+                    <th>Nr</th>
+                    <th>Arbeitsplatz</th>
+                    <th>Menge</th>
+                    <th>День недели</th>
+                    <th>Неделя месяца</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in StatisticsList)
+                {
+                    var worker = WorkersList.FirstOrDefault(w => w.Id == row.WorkerId);
+                    <tr>
+                        <td>@row.WorkDate.ToString("dd-MM-yyyy")</td>
+                        <td>@worker?.Name</td>
+                        <td>@worker?.Nr</td>
+                        <td>@worker?.Arbeitsplatz</td>
+                        <td>@row.Menge</td>
+                        <td>@row.Weekday</td>
+                        <td>@row.WeekOfMonth</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    // ==== ДАННЫЕ ====
+
+    // Список работников
+    private List<Worker> WorkersList { get; set; } = new();
+
+    // Список строк статистики
+    private List<StatisticRow> StatisticsList { get; set; } = new();
+
+    // Флаги состояния
+    private bool SessionChecked { get; set; }
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    // --- ФИЛЬТР ---
+
+    // Nr сотрудника (фильтр)
+    private string? FilterWorkerNr { get; set; } = "";
+
+    // Выбранный работник (Id) в фильтре — в виде строки для <select>
+    private string? FilterWorkerIdString { get; set; }
+
+    // Период дат для фильтра
+    private DateTime? FromDate { get; set; }
+    private DateTime? ToDate { get; set; }
+
+    // --- ДОБАВЛЕНИЕ ---
+
+    // Nr сотрудника (форма добавления)
+    private string? NewWorkerNr { get; set; } = "";
+
+    // Выбранный работник (Id) в форме добавления — строкой для <select>
+    private string? NewWorkerIdString { get; set; }
+
+    // Дата и количество для новой записи
+    private DateTime? NewWorkDate { get; set; }
+    private int? NewMenge { get; set; }
+
+    // ==== ИНИЦИАЛИЗАЦИЯ ====
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Поднимаем токен из localStorage
+        await SupabaseSession.InitializeAsync();
+        SessionChecked = true;
+
+        if (!SupabaseSession.IsAuthenticated)
+        {
+            return;
+        }
+
+        await LoadWorkersAsync();
+
+        // По умолчанию — текущий месяц
+        var today = DateTime.Today;
+        FromDate = new DateTime(today.Year, today.Month, 1);
+        ToDate = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+
+        // Для формы добавления — сегодняшняя дата
+        NewWorkDate = today;
+
+        // Если есть работники — выберем первого как дефолт
+        // if (WorkersList.Count > 0)
+        // {
+        //     var first = WorkersList[0];
+        //     FilterWorkerIdString = first.Id.ToString();
+        //     FilterWorkerNr = first.Nr;
+
+        //     NewWorkerIdString = first.Id.ToString();
+        //     NewWorkerNr = first.Nr;
+        // }
+
+        await LoadStatisticsAsync();
+    }
+
+    // ==== ЗАГРУЗКА ДАННЫХ ====
+
+    private async Task LoadWorkersAsync()
+    {
+        try
+        {
+            WorkersList = await SupabaseClient.GetWorkersAsync();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ошибка загрузки работников: {ex.Message}";
+        }
+    }
+
+    private async Task LoadStatisticsAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+
+        try
+        {
+            long? workerId = ParseLong(FilterWorkerIdString);
+            StatisticsList = await SupabaseClient.GetStatisticsAsync(FromDate, ToDate, workerId);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ошибка загрузки статистики: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task OnApplyFilter()
+    {
+        await LoadStatisticsAsync();
+    }
+
+    // ==== СИНХРОНИЗАЦИЯ ФИЛЬТРА (Nr <-> Имя) ====
+
+    // Пользователь меняет Nr в фильтре
+    private void OnFilterWorkerNrInput(ChangeEventArgs e)
+    {
+        FilterWorkerNr = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(FilterWorkerNr))
+        {
+            // Если Nr пустой — сбрасываем выбранного работника
+            FilterWorkerIdString = null;
+            return;
+        }
+
+        var w = WorkersList.FirstOrDefault(x => x.Nr == FilterWorkerNr);
+        if (w != null)
+        {
+            // Нашли работника по Nr — подставляем его Id в select
+            FilterWorkerIdString = w.Id.ToString();
+        }
+        else
+        {
+            // Нет такого Nr — оставляем select пустым
+            FilterWorkerIdString = null;
+        }
+    }
+
+    // Пользователь выбирает работника в фильтре по имени
+    private void OnFilterWorkerSelectChanged(ChangeEventArgs e)
+    {
+        FilterWorkerIdString = e.Value?.ToString();
+
+        if (long.TryParse(FilterWorkerIdString, out var id))
+        {
+            var w = WorkersList.FirstOrDefault(x => x.Id == id);
+            if (w != null)
+            {
+                FilterWorkerNr = w.Nr;
+            }
+        }
+        else
+        {
+            // Выбрано "Все"
+            FilterWorkerNr = null;
+        }
+    }
+
+    // ==== СИНХРОНИЗАЦИЯ ФОРМЫ ДОБАВЛЕНИЯ (Nr <-> Имя) ====
+
+    // Пользователь меняет Nr в форме добавления
+    private void OnNewWorkerNrInput(ChangeEventArgs e)
+    {
+        NewWorkerNr = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(NewWorkerNr))
+        {
+            NewWorkerIdString = null;
+            return;
+        }
+
+        var w = WorkersList.FirstOrDefault(x => x.Nr == NewWorkerNr);
+        if (w != null)
+        {
+            NewWorkerIdString = w.Id.ToString();
+        }
+        else
+        {
+            NewWorkerIdString = null;
+        }
+    }
+
+    // Пользователь выбирает работника по имени в форме добавления
+    private void OnNewWorkerSelectChanged(ChangeEventArgs e)
+    {
+        NewWorkerIdString = e.Value?.ToString();
+
+        if (long.TryParse(NewWorkerIdString, out var id))
+        {
+            var w = WorkersList.FirstOrDefault(x => x.Id == id);
+            if (w != null)
+            {
+                NewWorkerNr = w.Nr;
+            }
+        }
+        else
+        {
+            NewWorkerNr = null;
+        }
+    }
+
+    // ==== ДОБАВЛЕНИЕ ЗАПИСИ ====
+
+    private async Task OnAddStatistic()
+    {
+        ErrorMessage = null;
+
+        var workerId = ParseLong(NewWorkerIdString);
+
+        if (workerId == null || NewWorkDate == null || NewMenge == null)
+        {
+            ErrorMessage = "Выберите работника, дату и введите количество.";
+            return;
+        }
+
+        try
+        {
+            var created = await SupabaseClient.InsertStatisticAsync(workerId.Value, NewWorkDate.Value, NewMenge.Value);
+            if (created != null)
+            {
+                // Если запись попадает в текущий фильтр — можно добавить в список
+                StatisticsList.Add(created);
+                // Или можно полностью перезагрузить:
+                // await LoadStatisticsAsync();
+
+                // Сбросим количество
+                NewMenge = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ошибка добавления записи: {ex.Message}";
+        }
+    }
+
+    // ==== ВСПОМОГАТЕЛЬНОЕ ====
+
+    private static long? ParseLong(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s))
+            return null;
+
+        return long.TryParse(s, out var v) ? v : null;
+    }
+
+    private void GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

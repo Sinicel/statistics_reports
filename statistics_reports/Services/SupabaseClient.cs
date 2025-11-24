@@ -142,6 +142,100 @@ namespace statistics_reports.Services
             var createdList = await response.Content.ReadFromJsonAsync<List<Worker>>(_jsonOptions);
             return createdList?.FirstOrDefault();
         }
+
+        // Получить статистику с фильтрами:
+        // по работнику (опционально), по дате "с" и "по" (опционально)
+        public async Task<List<StatisticRow>> GetStatisticsAsync(
+            DateTime? fromDate = null,
+            DateTime? toDate = null,
+            long? workerId = null)
+        {
+            if (!_session.IsAuthenticated)
+                throw new Exception("Пользователь не авторизован.");
+
+            ApplyAuthHeader();
+
+            // Базовый URL: выбираем все поля
+            var url = "rest/v1/statistics_table?select=*";
+
+            // Собираем параметры
+            var queryParts = new List<string>();
+
+            if (workerId.HasValue)
+            {
+                queryParts.Add($"worker_id=eq.{workerId.Value}");
+            }
+
+            if (fromDate.HasValue)
+            {
+                queryParts.Add($"work_date=gte.{fromDate.Value:yyyy-MM-dd}");
+            }
+
+            if (toDate.HasValue)
+            {
+                queryParts.Add($"work_date=lte.{toDate.Value:yyyy-MM-dd}");
+            }
+
+            // Сортировка по дате
+            queryParts.Add("order=work_date.asc");
+
+            if (queryParts.Count > 0)
+            {
+                url += "&" + string.Join("&", queryParts);
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            using var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Ошибка получения статистики: {response.StatusCode} - {error}");
+            }
+
+            var rows = await response.Content.ReadFromJsonAsync<List<StatisticRow>>(_jsonOptions);
+            return rows ?? new List<StatisticRow>();
+        }
+
+
+        // Добавить запись в statistics_table
+        public async Task<StatisticRow?> InsertStatisticAsync(long workerId, DateTime workDate, int menge)
+        {
+            if (!_session.IsAuthenticated)
+                throw new Exception("Пользователь не авторизован.");
+
+            ApplyAuthHeader();
+
+            var url = "rest/v1/statistics_table";
+
+            // work_date отправляем как строку yyyy-MM-dd, чтобы было именно date
+            var body = new
+            {
+                worker_id = workerId,
+                work_date = workDate.ToString("yyyy-MM-dd"),
+                menge = menge
+            };
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = JsonContent.Create(body)
+            };
+
+            // Просим вернуть созданную строку
+            request.Headers.Add("Prefer", "return=representation");
+
+            using var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Ошибка добавления записи статистики: {response.StatusCode} - {error}");
+            }
+
+            var createdList = await response.Content.ReadFromJsonAsync<List<StatisticRow>>(_jsonOptions);
+            return createdList?.FirstOrDefault();
+        }
+
     }
 }
 
