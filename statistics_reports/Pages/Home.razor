@@ -1,5 +1,11 @@
 ﻿@page "/"
 
+@using statistics_reports.Services
+@using statistics_reports.Models
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>

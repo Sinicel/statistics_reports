@@ -1,4 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using statistics_reports.Services
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">statistics_reports</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -14,22 +19,41 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Главная
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Login">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Вход
-            </NavLink>
-        </div>
+
+        @* Показываем "Вход", только если пользователь не авторизован *@
+        @if (!SupabaseSession.IsAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Вход
+                </NavLink>
+            </div>
+        }
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="workers">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Работники
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink href="statistics" class="nav-link">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Статистика
             </NavLink>
         </div>
 
+        @* Кнопка "Выход" показывается только когда пользователь залогинен *@
+        @if (SupabaseSession.IsAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <button type="button"
+                        class="nav-link btn btn-link p-0"
+                        @onclick:stopPropagation="true"
+                        @onclick="OnLogoutClicked">
+                    <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Выход
+                </button>
+            </div>
+        }
     </nav>
 </div>
 
@@ -38,8 +62,39 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    protected override void OnInitialized()
+    {
+        // Подписываемся на изменения состояния сессии,
+        // чтобы меню сразу реагировало на логин/логаут.
+        SupabaseSession.OnChange += OnSessionChanged;
+    }
+
+    // Этот метод будет вызываться при каждом изменении токена/сессии
+    private void OnSessionChanged()
+    {
+        // Обновляем UI в правильном контексте синхронизации
+        InvokeAsync(StateHasChanged);
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    // Обработчик нажатия на кнопку "Выход"
+    private async Task OnLogoutClicked()
+    {
+        // Очищаем токен/сессию
+        await SupabaseSession.ClearAsync();
+
+        // Перенаправляем на страницу логина
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    // Отписываемся от события, когда компонент уничтожается,
+    // чтобы избежать утечек памяти и лишних вызовов.
+    public void Dispose()
+    {
+        SupabaseSession.OnChange -= OnSessionChanged;
     }
 }

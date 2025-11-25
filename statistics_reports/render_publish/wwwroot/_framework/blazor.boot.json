@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "statistics_reports",
   "resources": {
-    "hash": "sha256-80jLIYoytCvXkCerIAREh3d8vMw9W4FMrVHdvbTogio=",
+    "hash": "sha256-dz9fAOBW/sEd90M866PDicPaVWZF/Hn9ksaIoaOcUe4=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-9Fzd5We95Rp03dEKIAbYjPDR3eWyLbmjMlYStvxyiok="
     },
@@ -19,7 +19,7 @@
     "coreAssembly": {},
     "assembly": {
       "Microsoft.AspNetCore.Components.wasm": "sha256-uOtAaxMCSuykHwGD6UKNEJvhvQ3l1ZxOHlMfd55+fh4=",
-      "Microsoft.AspNetCore.Components.Web.wasm": "sha256-OlXTqlS+nVOnC0+7+2YMEeqSwnZcZrrkX53ZCWEDT8c=",
+      "Microsoft.AspNetCore.Components.Web.wasm": "sha256-GSYl1CXFAwiv+ES+gHnbMUd9SLD4z35FK0wkcxVvghY=",
       "Microsoft.AspNetCore.Components.WebAssembly.wasm": "sha256-FfCZmbJB4ZonVnLNW7mNqcYNgzc9AueTLtOB8qN5dOM=",
       "Microsoft.Extensions.Configuration.wasm": "sha256-od574rRtVVRJj+24jbl8j3GdQFpxlJOpSx+pEMw1Q18=",
       "Microsoft.Extensions.Configuration.Abstractions.wasm": "sha256-XR+WUfg8LtnrwdXFBnV+qO3ROyp6cYCfl1AZajIAheM=",
@@ -44,12 +44,13 @@
       "System.Net.Primitives.wasm": "sha256-nob0r89TxsMi74HX4X0B7Kp9yLO712wbcqVrAJZkcBk=",
       "System.Private.Uri.wasm": "sha256-L3f4vEAH/jUGGrnJUbXfVkx1Y7ZEPU9wC+MnUIV3tX4=",
       "System.Runtime.InteropServices.JavaScript.wasm": "sha256-kqfKd8NZQTjMJTCAoCkUcteV+onuES6cO4GrgT8RR4U=",
-      "System.Runtime.wasm": "sha256-x3WdQecb/j5ITl5C9z64tuA6urr/tWs8nHdWw1Pjnbk=",
+      "System.Runtime.wasm": "sha256-YVoVOBf2c39EY1++g8/RiG1ext8Ugt2CqEQAkDvANgo=",
       "System.Text.Encodings.Web.wasm": "sha256-7S68jyWsZZ2olIgRkjkQpWH9DTQfSDIL6MZd7edVfQw=",
       "System.Text.Json.wasm": "sha256-ybUqYDmqyxrbqV5BxpwbHADUoGxGIqD46zj2NhKIarI=",
       "System.Text.RegularExpressions.wasm": "sha256-tCTxwg2N3nkoTMDAtfc+X4iVUDF7K9iBuzpAhgC284E=",
+      "System.Threading.wasm": "sha256-nDQEhXyEi1hXuAlcdl+JUHT1UdazXnoLqzw0gnLqOXM=",
       "System.Private.CoreLib.wasm": "sha256-q4241nNfucpU0UAi7Y3WVe4g46UVfs2fKI4NuXZDyic=",
-      "statistics_reports.wasm": "sha256-17jDFZiXL2xiw6vB+7tOTf5iC2IAgptdKRxPvf/M0Lg="
+      "statistics_reports.wasm": "sha256-9al/mhlrgkSl0pQtJK/RnltDqK2YPeoi1gaH+s8oHGc="
     }
   },
   "cacheBootResources": true,

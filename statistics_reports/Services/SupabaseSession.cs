@@ -1,4 +1,6 @@
-﻿using Microsoft.JSInterop;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace statistics_reports.Services
 {
@@ -7,13 +9,35 @@ namespace statistics_reports.Services
     {
         private readonly IJSRuntime _jsRuntime;
 
+        // Событие, на которое могут подписываться компоненты (меню и т.п.),
+        // чтобы реагировать на изменение состояния сессии.
+        public event Action? OnChange;
+
         public SupabaseSession(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
         }
 
-        // Текущий токен в памяти
-        public string? AccessToken { get; private set; }
+        // Внутреннее поле для токена
+        private string? _accessToken;
+
+        // Текущий токен в памяти.
+        // При каждом изменении токена уведомляем подписчиков.
+        public string? AccessToken
+        {
+            get => _accessToken;
+            set
+            {
+                // Если значение не изменилось — выходим
+                if (_accessToken == value)
+                    return;
+
+                _accessToken = value;
+
+                // Уведомляем всех, кто подписался на изменения сессии
+                NotifyStateChanged();
+            }
+        }
 
         // Уже пробовали инициализироваться?
         public bool IsInitialized { get; private set; }
@@ -29,7 +53,8 @@ namespace statistics_reports.Services
 
             try
             {
-                AccessToken = await _jsRuntime.InvokeAsync<string?>("supabaseAuth.getToken");
+                var token = await _jsRuntime.InvokeAsync<string?>("supabaseAuth.getToken");
+                AccessToken = token; // через свойство, чтобы сработал OnChange
             }
             catch
             {
@@ -42,6 +67,7 @@ namespace statistics_reports.Services
         // Установка токена после логина + сохранение в localStorage
         public async Task SetTokenAsync(string token)
         {
+            // Сохраняем в память (через свойство, чтобы триггернуть OnChange)
             AccessToken = token;
 
             try
@@ -50,7 +76,8 @@ namespace statistics_reports.Services
             }
             catch
             {
-                // если не сохранилось в localStorage — не критично
+                // если не сохранилось в localStorage — не критично,
+                // токен всё равно есть в памяти
             }
 
             IsInitialized = true;
@@ -59,6 +86,7 @@ namespace statistics_reports.Services
         // Очистка токена (выход)
         public async Task ClearAsync()
         {
+            // Через свойство, чтобы сработал OnChange
             AccessToken = null;
 
             try
@@ -67,9 +95,16 @@ namespace statistics_reports.Services
             }
             catch
             {
+                // игнорируем ошибки JS — главное, что в памяти токен очищен
             }
 
             IsInitialized = true;
+        }
+
+        // Вызываем этот метод, когда изменяется состояние сессии
+        private void NotifyStateChanged()
+        {
+            OnChange?.Invoke();
         }
     }
 }
