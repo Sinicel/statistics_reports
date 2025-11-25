@@ -60,7 +60,14 @@ window.statisticsChart = (function () {
         });
     }
 
+    // Печать текущей страницы (график тоже попадёт в печать)
+    function printChart() {
+        window.print();
+    }
+
     return {
-        render: render
+        render: render,
+        print: printChart
     };
 })();
+

@@ -32,7 +32,9 @@
     <div class="col-md-3 mb-2">
         <label class="form-label">Месяц</label>
         @* Выбор месяца в формате yyyy-MM *@
-        <input class="form-control" type="month" @bind="SelectedMonth" />
+        <InputText class="form-control"
+                   type="month"
+                   @bind-Value="SelectedMonth" />
     </div>
 
     <div class="col-md-2 mb-2 d-flex align-items-end">
@@ -47,7 +49,16 @@
             }
         </button>
     </div>
+
+    <div class="col-md-2 mb-2 d-flex align-items-end">
+        <button class="btn btn-secondary w-100"
+                @onclick="OnPrintClicked"
+                disabled="@(ChartLabels.Count == 0)">
+            Распечатать
+        </button>
+    </div>
 </div>
+
 
 @if (ChartLabels?.Count > 0 && ChartData?.Count > 0)
 {
@@ -71,6 +82,8 @@
     // Данные для графика
     private List<string> ChartLabels { get; set; } = new();
     private List<int> ChartData { get; set; } = new();
+
+    private bool ChartNeedsRender { get; set; } = false;
 
     private bool IsBusy { get; set; }
     private string? ErrorMessage { get; set; }
@@ -159,12 +172,11 @@
                 return;
             }
 
-            // Вызываем JS для отрисовки графика
-            await Js.InvokeVoidAsync(
-                "statisticsChart.render",
-                "statisticsChart",
-                ChartLabels,
-                ChartData);
+            // Если данные есть — помечаем, что нужно перерисовать график
+            if (ChartLabels.Count > 0 && ChartData.Count > 0)
+            {
+                ChartNeedsRender = true;
+            }
         }
         catch (Exception ex)
         {
@@ -204,4 +216,30 @@
 
         return true;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Рисуем график только когда:
+        // - мы явно попросили (ChartNeedsRender == true)
+        // - и есть данные
+        if (ChartNeedsRender && ChartLabels.Count > 0 && ChartData.Count > 0)
+        {
+            ChartNeedsRender = false;
+
+            await Js.InvokeVoidAsync(
+                "statisticsChart.render",
+                "statisticsChart",
+                ChartLabels,
+                ChartData);
+        }
+    }
+
+    // Обработчик кнопки "Распечатать"
+    private async Task OnPrintClicked()
+    {
+        // Вызываем JS-функцию statisticsChart.print(), которая делает window.print()
+        await Js.InvokeVoidAsync("statisticsChart.print");
+    }
+
+
 }
