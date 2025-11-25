@@ -1,0 +1,207 @@
+﻿@page "/chart"
+
+@using System.Linq
+@using statistics_reports.Models
+@using statistics_reports.Services
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+@inject IJSRuntime Js
+
+<h3>График по работнику за месяц</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-4 mb-2">
+        <label class="form-label">Работник</label>
+        <select class="form-select" @bind="SelectedWorkerId">
+            <option value="">-- Выберите работника --</option>
+            @foreach (var worker in Workers)
+            {
+                @* Предполагаю, что в Worker есть свойства Id, Name, Nr.
+                   Если имена другие — поменяй под свою модель *@
+                <option value="@worker.Id">@worker.Name (@worker.Nr)</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-2">
+        <label class="form-label">Месяц</label>
+        @* Выбор месяца в формате yyyy-MM *@
+        <input class="form-control" type="month" @bind="SelectedMonth" />
+    </div>
+
+    <div class="col-md-2 mb-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100" @onclick="OnShowChartClicked" disabled="@IsBusy">
+            @if (IsBusy)
+            {
+                <span>Загружаем...</span>
+            }
+            else
+            {
+                <span>Показать график</span>
+            }
+        </button>
+    </div>
+</div>
+
+@if (ChartLabels?.Count > 0 && ChartData?.Count > 0)
+{
+    <div class="card" style="height: 400px;">
+        <div class="card-body">
+            <canvas id="statisticsChart"></canvas>
+        </div>
+    </div>
+}
+
+@code {
+    // Список работников для выбора
+    private List<Worker> Workers { get; set; } = new();
+
+    // Выбранный работник (Id)
+    private long? SelectedWorkerId { get; set; }
+
+    // ВЫБРАННЫЙ МЕСЯЦ — ОБЯЗАТЕЛЬНО string, НЕ TimeOnly и НЕ DateTime
+    private string? SelectedMonth { get; set; }
+
+    // Данные для графика
+    private List<string> ChartLabels { get; set; } = new();
+    private List<int> ChartData { get; set; } = new();
+
+    private bool IsBusy { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorMessage = null;
+
+        try
+        {
+            // Загружаем список работников
+            Workers = await SupabaseClient.GetWorkersAsync();
+
+            // По умолчанию текущий месяц
+            var now = DateTime.Now;
+            SelectedMonth = $"{now:yyyy-MM}";
+        }
+        catch (Exception ex)
+        {
+            // Обрабатываем истёкшую сессию
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка инициализации: {ex.Message}";
+        }
+    }
+
+    // Обработчик кнопки "Показать график"
+    private async Task OnShowChartClicked()
+    {
+        ErrorMessage = null;
+        ChartLabels.Clear();
+        ChartData.Clear();
+
+        if (!SelectedWorkerId.HasValue)
+        {
+            ErrorMessage = "Выберите работника.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(SelectedMonth))
+        {
+            ErrorMessage = "Выберите месяц.";
+            return;
+        }
+
+        if (!TryParseMonth(SelectedMonth, out var fromDate, out var toDate))
+        {
+            ErrorMessage = "Некорректный формат месяца.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            // Загружаем статистику за месяц по выбранному работнику
+            var rows = await SupabaseClient.GetStatisticsAsync(fromDate, toDate, SelectedWorkerId);
+
+            // Предполагаю, что в StatisticRow есть:
+            // - свойство DateTime WorkDate (дата)
+            // - свойство int Menge (количество)
+            // Если имена другие — обнови ниже под свою модель.
+            var grouped = rows
+                .GroupBy(r => r.WorkDate.Date)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            ChartLabels = grouped
+                .Select(g => g.Key.Day.ToString()) // день месяца
+                .ToList();
+
+            ChartData = grouped
+                .Select(g => g.Sum(r => r.Menge))
+                .ToList();
+
+            if (ChartLabels.Count == 0)
+            {
+                ErrorMessage = "За выбранный период данных нет.";
+                return;
+            }
+
+            // Вызываем JS для отрисовки графика
+            await Js.InvokeVoidAsync(
+                "statisticsChart.render",
+                "statisticsChart",
+                ChartLabels,
+                ChartData);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка загрузки статистики: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    // Разбор значения input type="month" (формат "yyyy-MM")
+    private bool TryParseMonth(string? monthValue, out DateTime fromDate, out DateTime toDate)
+    {
+        fromDate = default;
+        toDate = default;
+
+        if (string.IsNullOrWhiteSpace(monthValue))
+            return false;
+
+        // Ожидаем "yyyy-MM", дописываем первый день месяца
+        if (!DateTime.TryParse($"{monthValue}-01", out var firstDay))
+            return false;
+
+        fromDate = new DateTime(firstDay.Year, firstDay.Month, 1);
+        var lastDay = fromDate.AddMonths(1).AddDays(-1);
+        toDate = lastDay;
+
+        return true;
+    }
+}

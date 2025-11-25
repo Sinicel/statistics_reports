@@ -41,6 +41,12 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Статистика
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink href="chart" class="nav-link">
+                <span class="bi bi-bar-chart-fill-nav-menu" aria-hidden="true"></span> График
+            </NavLink>
+        </div>
+
 
         @* Кнопка "Выход" показывается только когда пользователь залогинен *@
         @if (SupabaseSession.IsAuthenticated)
