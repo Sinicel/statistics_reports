@@ -1,0 +1,444 @@
+﻿@page "/month-table"
+
+@using System.Linq
+@using Microsoft.AspNetCore.Components.Forms
+@using statistics_reports.Models
+@using statistics_reports.Services
+
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
+
+<h3>Таблица по месяцам</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-4 mb-2">
+        <label class="form-label">Работник</label>
+        <select class="form-select" @bind="SelectedWorkerId">
+            <option value="">Все</option>
+            @foreach (var worker in Workers)
+            {
+                <option value="@worker.Id">@worker.Name (@worker.Nr)</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-2">
+        <label class="form-label">Месяц</label>
+        <InputText class="form-control"
+                   type="month"
+                   @bind-Value="SelectedMonth" />
+    </div>
+
+    <div class="col-md-2 mb-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100"
+                @onclick="LoadDataAsync"
+                disabled="@IsBusy">
+            @if (IsBusy)
+            {
+                <span>Загружаем...</span>
+            }
+            else
+            {
+                <span>Показать</span>
+            }
+        </button>
+    </div>
+</div>
+
+@if (IsBusy && string.IsNullOrEmpty(ErrorMessage))
+{
+    <div>Загрузка данных...</div>
+}
+
+@if (!IsBusy && WeekNumbers.Count > 0 && Rows.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Имя</th>
+                    <th>Nr</th>
+                    <th>Arbeitsplatz</th>
+
+                    @* Даты по неделям + среднее за неделю *@
+                    @foreach (var week in WeekNumbers)
+                    {
+                        if (DatesByWeek.TryGetValue(week, out var datesInWeek))
+                        {
+                            foreach (var date in datesInWeek)
+                            {
+                                <th class="text-center">
+                                    @date.ToString("dd.MM")
+                                </th>
+                            }
+
+                            <th class="text-center bg-warning">
+                                Неделя @week
+                            </th>
+                        }
+                    }
+
+                    <th class="text-center">Месяц</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var row in Rows)
+                {
+                    <tr>
+                        <td>@row.Worker.Name</td>
+                        <td>@row.Worker.Nr</td>
+                        <td>@row.Worker.Arbeitsplatz</td>
+
+                        @* Ячейки по дням + среднее за неделю *@
+                        @foreach (var week in WeekNumbers)
+                        {
+                            var datesInWeek = DatesByWeek[week];
+
+                            foreach (var date in datesInWeek)
+                            {
+                                if (row.Daily.TryGetValue(date, out var value))
+                                {
+                                    <td class="text-end">@value</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+                            }
+
+                            if (row.WeeklyAverage.TryGetValue(week, out var wavg))
+                            {
+                                <td class="text-end bg-warning">
+                                    @wavg.ToString("0")
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="bg-warning"></td>
+                            }
+                        }
+
+                        <td class="text-end" style="@GetMonthCellStyle(row.MonthAverage)">
+                            @(row.MonthAverage.HasValue? row.MonthAverage.Value.ToString("0") : "")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-info">
+        За выбранный месяц данных нет.
+    </div>
+}
+
+@code {
+    // Список работников для фильтра
+    private List<Worker> Workers { get; set; } = new();
+
+    // Выбранный работник (null = "Все")
+    private long? SelectedWorkerId { get; set; }
+
+    // Выбранный месяц (строка вида "yyyy-MM")
+    private string? SelectedMonth { get; set; }
+
+    // Даты, по которым есть данные в БД
+    private List<DateTime> AllDates { get; set; } = new();
+
+    // Список номеров недель, которые реально есть (1..N)
+    private List<int> WeekNumbers { get; set; } = new();
+
+    // Сопоставление "номер недели в месяце -> список дат этой недели"
+    private Dictionary<int, List<DateTime>> DatesByWeek { get; set; } = new();
+
+    // Сформированные строки для таблицы
+    private List<WorkerRowData> Rows { get; set; } = new();
+
+    // Для градиента по месячному среднему
+    private double? MonthMin { get; set; }
+    private double? MonthMax { get; set; }
+
+    private bool IsBusy { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorMessage = null;
+
+        try
+        {
+            // Загружаем список работников
+            Workers = await SupabaseClient.GetWorkersAsync();
+
+            // По умолчанию текущий месяц
+            var now = DateTime.Now;
+            SelectedMonth = $"{now:yyyy-MM}";
+
+            // Сразу грузим данные для "Все" за текущий месяц
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка инициализации: {ex.Message}";
+        }
+    }
+
+    // Основная загрузка таблицы по фильтрам
+    private async Task LoadDataAsync()
+    {
+        ErrorMessage = null;
+        IsBusy = true;
+
+        AllDates.Clear();
+        WeekNumbers.Clear();
+        DatesByWeek.Clear();
+        Rows.Clear();
+        MonthMin = null;
+        MonthMax = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(SelectedMonth))
+            {
+                ErrorMessage = "Выберите месяц.";
+                return;
+            }
+
+            if (!TryParseMonth(SelectedMonth, out var fromDate, out var toDate))
+            {
+                ErrorMessage = "Некорректный формат месяца.";
+                return;
+            }
+
+            // Загружаем статистику за месяц (по всем или по одному работнику)
+            var stats = await SupabaseClient.GetStatisticsAsync(fromDate, toDate, SelectedWorkerId);
+
+            if (stats.Count == 0)
+            {
+                return; // ErrorMessage не выставляем, просто "данных нет"
+            }
+
+            // ----- Даты и недели -----
+
+            // Группируем по дате, упорядочиваем
+            var byDate = stats
+                .GroupBy(r => r.WorkDate.Date)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            AllDates = byDate.Select(g => g.Key).ToList();
+
+            // Сопоставление дата -> номер недели в месяце (берём из БД)
+            var dateToWeek = byDate.ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.WeekOfMonth).FirstOrDefault()
+            );
+
+            WeekNumbers = dateToWeek.Values
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            // Заполняем "даты по неделям"
+            DatesByWeek = WeekNumbers.ToDictionary(
+                week => week,
+                week => AllDates
+                    .Where(d => dateToWeek.TryGetValue(d, out var w) && w == week)
+                    .ToList()
+            );
+
+            // ----- Подготовка строк по работникам -----
+
+            // Для удобства: словарь WorkerId -> Worker
+            var workersById = Workers.ToDictionary(w => w.Id);
+
+            // Группировка статистики по работнику
+            var statsByWorker = stats
+                .GroupBy(r => r.WorkerId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Кого показываем: либо всех, либо одного
+            IEnumerable<long> workerIdsToShow;
+            if (SelectedWorkerId.HasValue)
+            {
+                workerIdsToShow = new[] { SelectedWorkerId.Value };
+            }
+            else
+            {
+                workerIdsToShow = workersById.Keys;
+            }
+
+            var rows = new List<WorkerRowData>();
+
+            foreach (var workerId in workerIdsToShow)
+            {
+                if (!workersById.TryGetValue(workerId, out var worker))
+                    continue;
+
+                var row = new WorkerRowData
+                {
+                    Worker = worker
+                };
+
+                if (statsByWorker.TryGetValue(workerId, out var list))
+                {
+                    // Ежедневные значения: суммируем по (дата)
+                    var daily = list
+                        .GroupBy(r => r.WorkDate.Date)
+                        .ToDictionary(
+                            g => g.Key,
+                            g => g.Sum(r => r.Menge)
+                        );
+
+                    foreach (var kv in daily)
+                    {
+                        row.Daily[kv.Key] = kv.Value;
+                    }
+
+                    // Средние по неделям:
+                    // берём (WeekOfMonth -> список дат) и внутри считаем среднее по дням
+                    var weekly = list
+                        .GroupBy(r => r.WeekOfMonth)
+                        .ToDictionary(
+                            g => g.Key,
+                            g =>
+                            {
+                                // по этой неделе группируем по дате, считаем сумму за день
+                                var perDay = g
+                                    .GroupBy(r => r.WorkDate.Date)
+                                    .Select(dg => dg.Sum(r => r.Menge))
+                                    .ToList();
+
+                                return perDay.Count > 0
+                                    ? perDay.Average()
+                                    : 0.0;
+                            });
+
+                    foreach (var kv in weekly)
+                    {
+                        row.WeeklyAverage[kv.Key] = kv.Value;
+                    }
+
+                    // Среднее за месяц: среднее по дневным суммам
+                    var monthPerDay = daily.Values.ToList();
+                    if (monthPerDay.Count > 0)
+                    {
+                        row.MonthAverage = monthPerDay.Average();
+                    }
+                }
+
+                rows.Add(row);
+            }
+
+            Rows = rows;
+
+            // ----- Градиент по месячной средней -----
+
+            var monthValues = Rows
+                .Where(r => r.MonthAverage.HasValue)
+                .Select(r => r.MonthAverage!.Value)
+                .ToList();
+
+            if (monthValues.Count > 0)
+            {
+                MonthMin = monthValues.Min();
+                MonthMax = monthValues.Max();
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка загрузки данных: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    // Разбор значения input type="month" (формат "yyyy-MM")
+    private bool TryParseMonth(string? monthValue, out DateTime fromDate, out DateTime toDate)
+    {
+        fromDate = default;
+        toDate = default;
+
+        if (string.IsNullOrWhiteSpace(monthValue))
+            return false;
+
+        // "2025-11" -> берём 1 число месяца
+        if (!DateTime.TryParse($"{monthValue}-01", out var firstDay))
+            return false;
+
+        fromDate = new DateTime(firstDay.Year, firstDay.Month, 1);
+        var lastDay = fromDate.AddMonths(1).AddDays(-1);
+        toDate = lastDay;
+
+        return true;
+    }
+
+    // Стиль для ячейки "Месяц" с градиентом от красного к зелёному
+    private string GetMonthCellStyle(double? value)
+    {
+        if (!value.HasValue || !MonthMin.HasValue || !MonthMax.HasValue)
+            return string.Empty;
+
+        var v = value.Value;
+        var min = MonthMin.Value;
+        var max = MonthMax.Value;
+
+        if (max <= min)
+        {
+            // Все одинаковые значения — нейтральный жёлтый
+            return "background-color: hsl(60, 90%, 60%);";
+        }
+
+        var t = (v - min) / (max - min);
+        if (t < 0) t = 0;
+        if (t > 1) t = 1;
+
+        // 0 -> красный (0°), 1 -> зелёный (120°)
+        var hue = 0 + t * 120;
+
+        return $"background-color: hsl({hue:F0}, 90%, 60%);";
+    }
+
+    // Вспомогательная модель для строки таблицы
+    private class WorkerRowData
+    {
+        // Сам работник
+        public Worker Worker { get; set; } = default!;
+
+        // Значения по дням: дата -> сумма Menge
+        public Dictionary<DateTime, int> Daily { get; } = new();
+
+        // Среднее по неделям: номер недели -> среднее Menge
+        public Dictionary<int, double> WeeklyAverage { get; } = new();
+
+        // Среднее за месяц по дням
+        public double? MonthAverage { get; set; }
+    }
+}

@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="logs\**" />
+    <Compile Remove="render_publish\render_publish\**" />
     <Content Remove="logs\**" />
+    <Content Remove="render_publish\render_publish\**" />
     <EmbeddedResource Remove="logs\**" />
+    <EmbeddedResource Remove="render_publish\render_publish\**" />
     <None Remove="logs\**" />
+    <None Remove="render_publish\render_publish\**" />
   </ItemGroup>
 
   <ItemGroup>

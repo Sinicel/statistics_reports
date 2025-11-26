@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "ZQ+GQyaO",
+  "version": "ZUPX2dtT",
   "assets": [
     {
       "hash": "sha256-1iKOJegOjo1RRPSy4m7hwDDn5fiZmx5qVl7e2i1a7Yo=",
@@ -74,7 +74,7 @@ self.assetsManifest = {
       "url": "_framework/System.Collections.Specialized.wasm"
     },
     {
-      "hash": "sha256-YmhE30gaXHNZppua5TMyM3MgBwWwq3b7SkqZ08gXDBQ=",
+      "hash": "sha256-M+V/vusAXwcYVLBnlSjHeddMtYOIERezFLT3G68smbY=",
       "url": "_framework/System.Collections.wasm"
     },
     {
@@ -102,7 +102,7 @@ self.assetsManifest = {
       "url": "_framework/System.Linq.Expressions.wasm"
     },
     {
-      "hash": "sha256-cLPbxjEA2/Zk9zO1dZrA4zsfQnLz4nBFlZ5kaipflJU=",
+      "hash": "sha256-jG3hqaQxEVVPpabu3X+5bP8XIQQOzmaAnlMzT4jnPqU=",
       "url": "_framework/System.Linq.wasm"
     },
     {
@@ -126,7 +126,7 @@ self.assetsManifest = {
       "url": "_framework/System.ObjectModel.wasm"
     },
     {
-      "hash": "sha256-NY0mN5A2zarAYLuLm5SGzJMae1QOnGU80eLwN4NRVcc=",
+      "hash": "sha256-NmlkbJ8ZL4G1bNMWFks90PRWGX7pI3ZV5HYLJiFUi/w=",
       "url": "_framework/System.Private.CoreLib.wasm"
     },
     {
@@ -142,7 +142,7 @@ self.assetsManifest = {
       "url": "_framework/System.Runtime.Serialization.Primitives.wasm"
     },
     {
-      "hash": "sha256-HsMqjhBCcY0xBtR3xFmO9nDXH/W8g0ShrTDhjE1gadY=",
+      "hash": "sha256-R4PkYzbr1Q5utrtKFHGepo/NWbdNJA7gsTUfIalxuOE=",
       "url": "_framework/System.Runtime.wasm"
     },
     {
@@ -166,7 +166,7 @@ self.assetsManifest = {
       "url": "_framework/System.wasm"
     },
     {
-      "hash": "sha256-510hENDyI8RoqZ6Bv9jUzv9VRni0m7EBCBXMWpgjjaY=",
+      "hash": "sha256-yK/zKbEQbCnmuphMxzkdntjCPfc7U+4F1hsPWBNgn18=",
       "url": "_framework/blazor.boot.json"
     },
     {
@@ -202,7 +202,7 @@ self.assetsManifest = {
       "url": "_framework/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-p+q/IFOkcIxnMBrqfvcBXsRS6d21BUjmB2xMmfdm25A=",
+      "hash": "sha256-yZsMcxGgg2fWMyXtTaDYO/56Pp7k1Ye0A1lsbselAoE=",
       "url": "_framework/statistics_reports.wasm"
     },
     {

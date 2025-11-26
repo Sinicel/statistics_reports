@@ -145,6 +145,7 @@ namespace statistics_reports.Services
 
         // Получить статистику с фильтрами:
         // по работнику (опционально), по дате "с" и "по" (опционально)
+        // ВАЖНО: метод сам делает пагинацию по 1000 строк.
         public async Task<List<StatisticRow>> GetStatisticsAsync(
             DateTime? fromDate = null,
             DateTime? toDate = null,
@@ -155,10 +156,50 @@ namespace statistics_reports.Services
 
             ApplyAuthHeader();
 
-            // Базовый URL: выбираем все поля
+            var allRows = new List<StatisticRow>();
+
+            const int pageSize = 1000; // максимум, который позволяет Supabase за один запрос
+            var offset = 0;
+
+            while (true)
+            {
+                // Собираем URL с лимитом и оффсетом
+                var url = BuildStatisticsUrl(fromDate, toDate, workerId, pageSize, offset);
+
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                using var response = await _httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Ошибка получения статистики: {response.StatusCode} - {error}");
+                }
+
+                var page = await response.Content.ReadFromJsonAsync<List<StatisticRow>>(_jsonOptions)
+                           ?? new List<StatisticRow>();
+
+                allRows.AddRange(page);
+
+                // Если вернулось меньше, чем pageSize, значит это была последняя страница
+                if (page.Count < pageSize)
+                    break;
+
+                offset += pageSize;
+            }
+
+            return allRows;
+        }
+
+        // Вспомогательный метод: собираем строку запроса с фильтрами + пагинацией
+        private string BuildStatisticsUrl(
+            DateTime? fromDate,
+            DateTime? toDate,
+            long? workerId,
+            int limit,
+            int offset)
+        {
             var url = "rest/v1/statistics_table?select=*";
 
-            // Собираем параметры
             var queryParts = new List<string>();
 
             if (workerId.HasValue)
@@ -179,23 +220,18 @@ namespace statistics_reports.Services
             // Сортировка по дате
             queryParts.Add("order=work_date.asc");
 
+            // Параметры пагинации
+            queryParts.Add($"limit={limit}");
+            queryParts.Add($"offset={offset}");
+
             if (queryParts.Count > 0)
             {
                 url += "&" + string.Join("&", queryParts);
             }
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            using var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Ошибка получения статистики: {response.StatusCode} - {error}");
-            }
-
-            var rows = await response.Content.ReadFromJsonAsync<List<StatisticRow>>(_jsonOptions);
-            return rows ?? new List<StatisticRow>();
+            return url;
         }
+
 
 
         // Добавить запись в statistics_table
