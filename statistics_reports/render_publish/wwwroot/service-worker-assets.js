@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "ZUPX2dtT",
+  "version": "xw4dzAc6",
   "assets": [
     {
       "hash": "sha256-1iKOJegOjo1RRPSy4m7hwDDn5fiZmx5qVl7e2i1a7Yo=",
@@ -14,7 +14,7 @@ self.assetsManifest = {
       "url": "_framework/Microsoft.AspNetCore.Components.WebAssembly.wasm"
     },
     {
-      "hash": "sha256-n8jqWcyE0CvvoQC57ATGswqw3e+LkxVgMtjFuQ55pQM=",
+      "hash": "sha256-rvh2g1v7QqKgfYkVI43KGTDUyIthhQoGF5zBhiXVE74=",
       "url": "_framework/Microsoft.AspNetCore.Components.wasm"
     },
     {
@@ -114,7 +114,7 @@ self.assetsManifest = {
       "url": "_framework/System.Net.Http.Json.wasm"
     },
     {
-      "hash": "sha256-6yH2z5JmyKKzXN2Zrebn1C+zwu1osa8wjcs2v8xF40A=",
+      "hash": "sha256-+Axx0WLCJSj1QIGfErbz1/cDY79867q5bty0v4m2drU=",
       "url": "_framework/System.Net.Http.wasm"
     },
     {
@@ -142,7 +142,7 @@ self.assetsManifest = {
       "url": "_framework/System.Runtime.Serialization.Primitives.wasm"
     },
     {
-      "hash": "sha256-R4PkYzbr1Q5utrtKFHGepo/NWbdNJA7gsTUfIalxuOE=",
+      "hash": "sha256-F0Jwi0Y2w3w+T0AE7ygbjTM0r1qC5iPAu84G9fhJZgU=",
       "url": "_framework/System.Runtime.wasm"
     },
     {
@@ -166,7 +166,7 @@ self.assetsManifest = {
       "url": "_framework/System.wasm"
     },
     {
-      "hash": "sha256-yK/zKbEQbCnmuphMxzkdntjCPfc7U+4F1hsPWBNgn18=",
+      "hash": "sha256-iVpS5CPJ0CEC7/tj6e4mPFulimXoCWliG3fklcoyTOM=",
       "url": "_framework/blazor.boot.json"
     },
     {
@@ -202,7 +202,7 @@ self.assetsManifest = {
       "url": "_framework/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-yZsMcxGgg2fWMyXtTaDYO/56Pp7k1Ye0A1lsbselAoE=",
+      "hash": "sha256-V11iM6bmt6mAbBdiAdaQmgTmHXA/tdKfpVcau8GIBHw=",
       "url": "_framework/statistics_reports.wasm"
     },
     {
@@ -238,7 +238,7 @@ self.assetsManifest = {
       "url": "js/statChart.js"
     },
     {
-      "hash": "sha256-z6/N132TutXfd5GcXBszfhMvSF+Lj9t7B/5IiNI0Gfw=",
+      "hash": "sha256-eh2wcTF7g31rPFnX4RTyRglWZssxwzttcWHJjbqWlXs=",
       "url": "js/supabaseAuth.js"
     },
     {

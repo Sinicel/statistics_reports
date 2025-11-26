@@ -173,7 +173,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
     protected override async Task OnInitializedAsync()
     {
         ErrorMessage = null;
-
+        IsBusy = true;
         try
         {
             // Загружаем список работников

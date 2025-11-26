@@ -63,14 +63,14 @@ else
                 </div>
 
                 <div class="col-md-1 d-flex align-items-end">
-                    <button class="btn btn-secondary w-100" @onclick="OnApplyFilter">
+                    <button class="btn btn-primary w-100"  @onclick="OnApplyFilter">
                         Применить
                     </button>
                 </div>
             </div>
         </div>
     </div>
-
+    //style="background:#610152"
     <!-- ДОБАВИТЬ ЗАПИСЬ -->
     <div class="card mb-3">
         <div class="card-body">
@@ -90,7 +90,7 @@ else
                             value="@NewWorkerIdString"
                             @onchange="OnNewWorkerSelectChanged">
                         <option value="">-- выбрать --</option>
-                        @foreach (var w in WorkersList)
+                        @foreach (var w in WorkersList.Where(w=>w.IsActive==true))
                         {
                             <option value="@w.Id">@w.Name (@w.Nr)</option>
                         }
@@ -117,11 +117,12 @@ else
     </div>
 
     <!-- ТАБЛИЦА -->
+    
     @if (IsLoading)
     {
         <p>Загрузка статистики...</p>
     }
-    else if (StatisticsList.Count == 0)
+    else if (StatisticsList.Count == 0 && IsLoading == false)
     {
         <p>Записей не найдено.</p>
     }
@@ -198,6 +199,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         // Поднимаем токен из localStorage
         await SupabaseSession.InitializeAsync();
         SessionChecked = true;
@@ -227,7 +229,7 @@ else
         //     NewWorkerIdString = first.Id.ToString();
         //     NewWorkerNr = first.Nr;
         // }
-
+       
         await LoadStatisticsAsync();
     }
 
@@ -238,6 +240,7 @@ else
         try
         {
             WorkersList = await SupabaseClient.GetWorkersAsync();
+            
         }
         catch (Exception ex)
         {

@@ -1,192 +1,411 @@
 ﻿@page "/"
 @page "/workers"
 
-@using statistics_reports.Services
 @using statistics_reports.Models
+@using statistics_reports.Services
 @inject SupabaseClient SupabaseClient
 @inject SupabaseSession SupabaseSession
 @inject NavigationManager Navigation
 
 <h3>Работники</h3>
 
-@if (!SessionChecked)
-{
-    <p>Проверка входа...</p>
-}
-else if (!SupabaseSession.IsAuthenticated)
-{
-    <div class="alert alert-warning">
-        Вы не авторизованы. Пожалуйста, войдите в систему.
-    </div>
-    <button class="btn btn-primary" @onclick="GoToLogin">Перейти на страницу входа</button>
-}
-else if (IsLoading)
-{
-    <p>Загрузка...</p>
-}
-else if (!string.IsNullOrEmpty(ErrorMessage))
+@if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-danger">@ErrorMessage</div>
 }
-else
-{
-    <button class="btn btn-success mb-3" @onclick="ShowAddForm">
-        Добавить работника
-    </button>
 
-    @if (ShowForm)
-    {
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="mb-2">
-                    <label class="form-label">Имя</label>
-                    <input class="form-control" @bind="NewName" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Nr</label>
-                    <input class="form-control" @bind="NewNr" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Arbeitsplatz</label>
-                    <input class="form-control" @bind="NewArbeitsplatz" />
-                </div>
-                <button class="btn btn-primary me-2" @onclick="OnAddWorker">Сохранить</button>
-                <button class="btn btn-secondary" @onclick="HideAddForm">Отмена</button>
+@if (!string.IsNullOrEmpty(InfoMessage))
+{
+    <div class="alert alert-info">@InfoMessage</div>
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Добавить работника</h5>
+
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input class="form-control"
+                       placeholder="Имя"
+                       @bind="NewName" />
+            </div>
+            <div class="col-md-3">
+                <input class="form-control"
+                       placeholder="Nr"
+                       @bind="NewNr" />
+            </div>
+            <div class="col-md-3">
+                <input class="form-control"
+                       placeholder="Arbeitsplatz"
+                       @bind="NewArbeitsplatz" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary"
+                        @onclick="OnAddWorkerAsync"
+                        disabled="@IsBusy">
+                    Добавить
+                </button>
             </div>
         </div>
-    }
+    </div>
+</div>
 
-    @if (WorkersList.Count == 0)
-    {
-        <p>Пока нет ни одного работника.</p>
-    }
-    else
-    {
-        <table class="table table-striped">
-            <thead>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Список работников</h5>
+
+    <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               id="showInactive"
+               @bind="ShowInactive" />
+        <label class="form-check-label" for="showInactive">
+            Показывать неактивных
+        </label>
+    </div>
+</div>
+
+@if (IsBusy && AllWorkers.Count == 0)
+{
+    <div>Загрузка списка работников...</div>
+}
+else if (WorkersToShow.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
                 <tr>
-                    <th>Id</th>
                     <th>Имя</th>
                     <th>Nr</th>
                     <th>Arbeitsplatz</th>
+                    <th class="text-center">Статус</th>
+                    <th class="text-center">Действие</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var w in WorkersList)
+                @foreach (var w in WorkersToShow)
                 {
-                    <tr>
-                        <td>@w.Id</td>
+                    var rowClass = w.IsActive ? "" : "table-secondary text-muted";
+
+                    <tr class="@rowClass">
                         <td>@w.Name</td>
                         <td>@w.Nr</td>
                         <td>@w.Arbeitsplatz</td>
+                        <td class="text-center">
+                            @if (w.IsActive)
+                            {
+                                <span class="badge bg-success">Активен</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Неактивен</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (w.IsActive)
+                            {
+                                <button class="btn btn-sm btn-outline-danger"
+                                        title="Сделать неактивным"
+                                        @onclick="() => AskDeactivate(w)">
+                                    &#10006; @* красный X *@
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        title="Сделать активным"
+                                        @onclick="() => AskActivate(w)">
+                                    &#8635; @* стрелка "вернуть" *@
+                                </button>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
-    }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Работников нет.
+    </div>
+}
+
+@* Простое "модальное" окно подтверждения увольнения *@
+@if (ShowConfirm && TargetWorker is not null)
+{
+    <div class="position-fixed top-0 start-0 w-100 h-100"
+         style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="card" style="max-width: 400px; width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @(ConfirmMode == ConfirmModeType.Deactivate ? "Уволить работника?" : "Сделать работника активным?")
+                    </h5>
+
+                    <p class="card-text">
+                        @if (ConfirmMode == ConfirmModeType.Deactivate)
+                        {
+                            <span>
+                                Работник <strong>@TargetWorker.Name (@TargetWorker.Nr)</strong> будет помечен как
+                                неактивный. Он исчезнет из списков при добавлении новой статистики,
+                                но останется во всех отчётах и старых записях.
+                            </span>
+                        }
+                        else
+                        {
+                            <span>
+                                Работник <strong>@TargetWorker.Name (@TargetWorker.Nr)</strong> будет снова помечен как активный
+                                и появится в списках при добавлении новой статистики.
+                            </span>
+                        }
+                    </p>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-secondary btn-sm" @onclick="CancelConfirm">
+                            Отмена
+                        </button>
+
+                        @if (ConfirmMode == ConfirmModeType.Deactivate)
+                        {
+                            <button class="btn btn-danger btn-sm" @onclick="ConfirmDeactivateAsync">
+                                Уволить
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success btn-sm" @onclick="ConfirmActivateAsync">
+                                Сделать активным
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
-    private List<Worker> WorkersList { get; set; } = new();
+    // Все работники из БД (активные + неактивные)
+    private List<Worker> AllWorkers { get; set; } = new();
 
-    private bool IsLoading { get; set; }
-    private string? ErrorMessage { get; set; }
+    // Флаг: показывать ли неактивных в таблице
+    private bool ShowInactive { get; set; } = false;
 
-    private bool ShowForm { get; set; }
+    // Вычисляемая коллекция для отображения
+    private IEnumerable<Worker> WorkersToShow =>
+        ShowInactive ? AllWorkers : AllWorkers.Where(w => w.IsActive);
+
+    // Поля формы "Добавить работника"
     private string NewName { get; set; } = string.Empty;
     private string NewNr { get; set; } = string.Empty;
     private string NewArbeitsplatz { get; set; } = string.Empty;
 
-    // Флаг, что мы уже один раз проверили сессию (InitializeAsync)
-    private bool SessionChecked { get; set; }
+    // Для "модального" подтверждения
+    private bool ShowConfirm { get; set; } = false;
+    private Worker? TargetWorker { get; set; }
+
+    private enum ConfirmModeType
+    {
+        Deactivate,
+        Activate
+    }
+
+    private ConfirmModeType ConfirmMode { get; set; }
+
+    private bool IsBusy { get; set; }
+    private string? ErrorMessage { get; set; }
+    private string? InfoMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Инициализируем сессию (если ещё нет) — читаем токен из localStorage
-        await SupabaseSession.InitializeAsync();
-        SessionChecked = true;
-
-        // 2. Если уже есть токен — грузим работников
-        if (SupabaseSession.IsAuthenticated)
-        {
-            await LoadWorkersAsync();
-        }
+        await LoadWorkersAsync();
     }
 
+    // Загрузка списка работников
     private async Task LoadWorkersAsync()
     {
-        IsLoading = true;
         ErrorMessage = null;
+        InfoMessage = null;
+        IsBusy = true;
 
         try
         {
-            WorkersList = await SupabaseClient.GetWorkersAsync();
+            AllWorkers = await SupabaseClient.GetWorkersAsync();
         }
         catch (Exception ex)
         {
-            
-                // Если токен истёк
-                if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Красивое сообщение для пользователя
-                    ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
 
-                    // Очищаем сессию (токен в памяти и в localStorage)
-                    await SupabaseSession.ClearAsync();
-
-                    // Перенаправляем на страницу логина
-                    Navigation.NavigateTo("/login", forceLoad: true);
-
-                    return;
-                }
-            ErrorMessage = ex.Message;
+            ErrorMessage = $"Ошибка загрузки работников: {ex.Message}";
         }
         finally
         {
-            IsLoading = false;
+            IsBusy = false;
         }
     }
 
-    private void ShowAddForm()
+    // Добавление нового работника
+    private async Task OnAddWorkerAsync()
     {
-        ShowForm = true;
-        NewName = string.Empty;
-        NewNr = string.Empty;
-        NewArbeitsplatz = string.Empty;
-    }
+        ErrorMessage = null;
+        InfoMessage = null;
 
-    private void HideAddForm()
-    {
-        ShowForm = false;
-    }
-
-    private async Task OnAddWorker()
-    {
         if (string.IsNullOrWhiteSpace(NewName) ||
             string.IsNullOrWhiteSpace(NewNr) ||
             string.IsNullOrWhiteSpace(NewArbeitsplatz))
         {
-            ErrorMessage = "Заполните все поля.";
+            ErrorMessage = "Заполните все поля для добавления работника.";
             return;
         }
+
+        IsBusy = true;
 
         try
         {
             var created = await SupabaseClient.InsertWorkerAsync(NewName, NewNr, NewArbeitsplatz);
+
             if (created != null)
             {
-                WorkersList.Add(created);
-                HideAddForm();
+                AllWorkers.Add(created);
+                InfoMessage = "Работник добавлен.";
+                NewName = string.Empty;
+                NewNr = string.Empty;
+                NewArbeitsplatz = string.Empty;
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка добавления работника: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
-    private void GoToLogin()
+    // Нажали на красный X (уволить)
+    private void AskDeactivate(Worker worker)
     {
-        Navigation.NavigateTo("/login");
+        TargetWorker = worker;
+        ConfirmMode = ConfirmModeType.Deactivate;
+        ShowConfirm = true;
+    }
+
+    // Нажали на "вернуть" (сделать активным)
+    private void AskActivate(Worker worker)
+    {
+        TargetWorker = worker;
+        ConfirmMode = ConfirmModeType.Activate;
+        ShowConfirm = true;
+    }
+
+    private void CancelConfirm()
+    {
+        ShowConfirm = false;
+        TargetWorker = null;
+    }
+
+    // Подтверждение "уволить"
+    private async Task ConfirmDeactivateAsync()
+    {
+        if (TargetWorker is null)
+            return;
+
+        ErrorMessage = null;
+        InfoMessage = null;
+        IsBusy = true;
+
+        try
+        {
+            var updated = await SupabaseClient.SetWorkerActiveAsync(TargetWorker.Id, false);
+            if (updated != null)
+            {
+                // Обновляем запись в локальном списке
+                var w = AllWorkers.FirstOrDefault(x => x.Id == updated.Id);
+                if (w != null)
+                {
+                    w.IsActive = updated.IsActive;
+                }
+
+                InfoMessage = "Работник помечен как неактивный.";
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка изменения статуса: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+            ShowConfirm = false;
+            TargetWorker = null;
+        }
+    }
+
+    // Подтверждение "сделать активным"
+    private async Task ConfirmActivateAsync()
+    {
+        if (TargetWorker is null)
+            return;
+
+        ErrorMessage = null;
+        InfoMessage = null;
+        IsBusy = true;
+
+        try
+        {
+            var updated = await SupabaseClient.SetWorkerActiveAsync(TargetWorker.Id, true);
+            if (updated != null)
+            {
+                var w = AllWorkers.FirstOrDefault(x => x.Id == updated.Id);
+                if (w != null)
+                {
+                    w.IsActive = updated.IsActive;
+                }
+
+                InfoMessage = "Работник снова активен.";
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                await SupabaseSession.ClearAsync();
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            ErrorMessage = $"Ошибка изменения статуса: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+            ShowConfirm = false;
+            TargetWorker = null;
+        }
     }
 }

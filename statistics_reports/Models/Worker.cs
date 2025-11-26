@@ -16,6 +16,10 @@ namespace statistics_reports.Models
 
         [JsonPropertyName("arbeitsplatz")]
         public string Arbeitsplatz { get; set; } = string.Empty;
+
+        // Признак активности (true = работает сейчас, false = уволен/неактивен)
+        [JsonPropertyName("is_active")]
+        public bool IsActive { get; set; } = true;
     }
 }
 

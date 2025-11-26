@@ -15,4 +15,4 @@
     clearToken: function () {
         localStorage.removeItem('supabase_access_token');
     }
-};
+}; 

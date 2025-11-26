@@ -143,6 +143,45 @@ namespace statistics_reports.Services
             return createdList?.FirstOrDefault();
         }
 
+
+        // Пометить работника как активного/неактивного
+        // isActive = false -> "уволить", true -> "вернуть"
+        public async Task<Worker?> SetWorkerActiveAsync(long workerId, bool isActive)
+        {
+            if (!_session.IsAuthenticated)
+                throw new Exception("Пользователь не авторизован.");
+
+            ApplyAuthHeader();
+
+            // Фильтр по id
+            var url = $"rest/v1/workers_table?id_w=eq.{workerId}";
+
+            var body = new
+            {
+                is_active = isActive
+            };
+
+            using var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+            {
+                Content = JsonContent.Create(body)
+            };
+
+            // Просим Supabase вернуть обновлённую строку
+            request.Headers.Add("Prefer", "return=representation");
+
+            using var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Ошибка обновления работника: {response.StatusCode} - {error}");
+            }
+
+            var updatedList = await response.Content.ReadFromJsonAsync<List<Worker>>(_jsonOptions);
+            return updatedList?.FirstOrDefault();
+        }
+
+
         // Получить статистику с фильтрами:
         // по работнику (опционально), по дате "с" и "по" (опционально)
         // ВАЖНО: метод сам делает пагинацию по 1000 строк.
