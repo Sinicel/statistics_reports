@@ -10,7 +10,10 @@
 @inject NavigationManager Navigation
 
 <h3>Статистика</h3>
-
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
 @if (!SessionChecked)
 {
     <p>Проверка входа...</p>
@@ -135,17 +138,17 @@ else
                 <thead>
                     <tr>
                         <th @onclick="() => ChangeStatsSort(StatsSortColumn.Date)"
-                            style="cursor: pointer; white-space: nowrap;">
+                            style="width: 15%; cursor: pointer; white-space: nowrap;">
                             Дата @GetStatsSortIcon(StatsSortColumn.Date)
                         </th>
                         <th @onclick="() => ChangeStatsSort(StatsSortColumn.Worker)"
-                            style="cursor: pointer; white-space: nowrap;">
+                             style="width: 25%; cursor: pointer; white-space: nowrap;">
                             Работник @GetStatsSortIcon(StatsSortColumn.Worker)
                         </th>
-                        <th>Nr</th>
-                        <th>Arbeitsplatz</th>
+                        <th style="width: 10%;"> Nr</th>
+                        <th style="width: 15%;"> Arbeitsplatz</th>
                         <th @onclick="() => ChangeStatsSort(StatsSortColumn.Menge)"
-                            style="cursor: pointer; white-space: nowrap;">
+                             style="width: 10%; cursor: pointer; white-space: nowrap;">
                             Menge @GetStatsSortIcon(StatsSortColumn.Menge)
                         </th>
                     </tr>

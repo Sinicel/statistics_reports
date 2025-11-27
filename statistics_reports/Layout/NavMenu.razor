@@ -20,16 +20,6 @@
             </NavLink>
         </div>
 
-        @* Показываем "Вход", только если пользователь не авторизован *@
-        @if (!SupabaseSession.IsAuthenticated)
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="login">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>  Вход
-                </NavLink>
-            </div>
-        }
-
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="workers">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span>  Работники
@@ -41,30 +31,29 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span>  Статистика
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink href="chart" class="nav-link">
                 <span class="bi bi-bar-chart-fill-nav-menu" aria-hidden="true"></span> 📈 График
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink href="month-table" class="nav-link">
                 <span class="bi bi-table-nav-menu" aria-hidden="true"></span> Таблица
             </NavLink>
         </div>
 
-
-        @* Кнопка "Выход" показывается только когда пользователь залогинен *@
-        @if (SupabaseSession.IsAuthenticated)
-        {
-            <div class="nav-item px-3">
-                <button type="button"
-                        class="nav-link btn btn-link p-0"
-                        @onclick:stopPropagation="true"
-                        @onclick="OnLogoutClicked">
-                    <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Выход
-                </button>
-            </div>
-        }
+        @* ОДИН пункт меню "Вход/Выход" как обычный элемент, сразу после остальных *@
+        <div class="nav-item px-3">
+            <a href="login"
+               class="@AuthLinkClass"
+               @onclick:preventDefault="true" 
+               @onclick:stopPropagation="true" 
+               @onclick="OnAuthLinkClicked">
+                <span class="@AuthIconClass" aria-hidden="true"></span> @AuthText
+            </a>
+        </div>
     </nav>
 </div>
 
@@ -76,14 +65,12 @@
     protected override void OnInitialized()
     {
         // Подписываемся на изменения состояния сессии,
-        // чтобы меню сразу реагировало на логин/логаут.
+        // чтобы пункт "Вход/Выход" сразу обновлялся
         SupabaseSession.OnChange += OnSessionChanged;
     }
 
-    // Этот метод будет вызываться при каждом изменении токена/сессии
     private void OnSessionChanged()
     {
-        // Обновляем UI в правильном контексте синхронизации
         InvokeAsync(StateHasChanged);
     }
 
@@ -92,18 +79,35 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
-    // Обработчик нажатия на кнопку "Выход"
-    private async Task OnLogoutClicked()
-    {
-        // Очищаем токен/сессию
-        await SupabaseSession.ClearAsync();
+    // Текст ссылки
+    private string AuthText => SupabaseSession.IsAuthenticated ? "Выход" : "Вход";
 
-        // Перенаправляем на страницу логина
-        Navigation.NavigateTo("/login", forceLoad: true);
+    // Иконка
+    private string AuthIconClass => SupabaseSession.IsAuthenticated
+        ? "bi bi-box-arrow-right-nav-menu"
+        : "bi bi-box-arrow-in-right-nav-menu";
+
+    // Класс ссылки (цвет)
+    private string AuthLinkClass => SupabaseSession.IsAuthenticated
+        ? "nav-link text-danger"   // залогинен → "Выход" красным
+        : "nav-link text-success"; // не залогинен → "Вход" зелёным
+
+    // Универсальный обработчик клика по пункту "Вход/Выход"
+    private async Task OnAuthLinkClicked()
+    {
+        if (SupabaseSession.IsAuthenticated)
+        {
+            // Если авторизован — выходим и ведём на логин
+            await SupabaseSession.ClearAsync();
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        else
+        {
+            // Если не авторизован — просто ведём на логин
+            Navigation.NavigateTo("/login");
+        }
     }
 
-    // Отписываемся от события, когда компонент уничтожается,
-    // чтобы избежать утечек памяти и лишних вызовов.
     public void Dispose()
     {
         SupabaseSession.OnChange -= OnSessionChanged;
