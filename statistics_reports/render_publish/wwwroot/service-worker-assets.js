@@ -1,5 +1,5 @@
 self.assetsManifest = {
-  "version": "yRfL3OCV",
+  "version": "f/7EOvsz",
   "assets": [
     {
       "hash": "sha256-1iKOJegOjo1RRPSy4m7hwDDn5fiZmx5qVl7e2i1a7Yo=",
@@ -166,7 +166,7 @@ self.assetsManifest = {
       "url": "_framework/System.wasm"
     },
     {
-      "hash": "sha256-yBaBI+XEdftb3h2HLBnejHfX64fuN+68wihdaooCDpI=",
+      "hash": "sha256-v6W4nJcIe46kGDsH8/eD0rqLyr1tG1x769M1i4nQwVg=",
       "url": "_framework/blazor.boot.json"
     },
     {
@@ -202,7 +202,7 @@ self.assetsManifest = {
       "url": "_framework/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-gc4d24amgJhhGmQ0uQc85+G/5UMiijyPx0F+Psr1hvQ=",
+      "hash": "sha256-2H6BERdWVJWkviZNQjreuMT0+PuKscYhS89+LSdvF/Q=",
       "url": "_framework/statistics_reports.wasm"
     },
     {
@@ -238,7 +238,7 @@ self.assetsManifest = {
       "url": "js/statChart.js"
     },
     {
-      "hash": "sha256-eh2wcTF7g31rPFnX4RTyRglWZssxwzttcWHJjbqWlXs=",
+      "hash": "sha256-zKWZFIUG62ph/jQpVAd3IwOsSknG2Hj9/Y6ltngN9ZM=",
       "url": "js/supabaseAuth.js"
     },
     {
