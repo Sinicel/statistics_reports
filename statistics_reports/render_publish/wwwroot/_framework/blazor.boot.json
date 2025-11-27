@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "statistics_reports",
   "resources": {
-    "hash": "sha256-c1N2TKTrjMUyPsDXACYohb4cUGSL9nAxVRlqS8C6UFg=",
+    "hash": "sha256-NDfKiq3iDsgBmGc1n4yFHqkhOuZeCtNiDJH7rb7u+oU=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-9Fzd5We95Rp03dEKIAbYjPDR3eWyLbmjMlYStvxyiok="
     },
@@ -18,7 +18,7 @@
     },
     "coreAssembly": {},
     "assembly": {
-      "Microsoft.AspNetCore.Components.wasm": "sha256-rvh2g1v7QqKgfYkVI43KGTDUyIthhQoGF5zBhiXVE74=",
+      "Microsoft.AspNetCore.Components.wasm": "sha256-oMJ3kMvhoGI1a6d5F76H6yuO42RSx55lnRavTN09wP8=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-1iKOJegOjo1RRPSy4m7hwDDn5fiZmx5qVl7e2i1a7Yo=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-AQJJIOUqVCP4gzoeDCX2urVzmN0LfzbXaieQXGpEzTA=",
       "Microsoft.AspNetCore.Components.WebAssembly.wasm": "sha256-Ytvy8CoGTpQ8T9C6pUC1APPOYmuCm6rVpgWFTIGq8Sg=",
@@ -43,7 +43,7 @@
       "System.Console.wasm": "sha256-AHShTnkYWCUJ0uwA1XQNQz5oeluXWnplJyPeiyAqBIg=",
       "System.Diagnostics.DiagnosticSource.wasm": "sha256-dkIiroFt0Ca+ZzmE0vkj3EH4v22i4LoOy/Ey+k46fCA=",
       "System.Linq.Expressions.wasm": "sha256-p3WZWpN/KghFxjbfMyipE8w2pT1gq2O3eGNcCV8iD3Y=",
-      "System.Linq.wasm": "sha256-jG3hqaQxEVVPpabu3X+5bP8XIQQOzmaAnlMzT4jnPqU=",
+      "System.Linq.wasm": "sha256-RBgxv2IrJMr7BtOMW7eJMOz+t4NhH9TYf8gvlWxAkE4=",
       "System.Memory.wasm": "sha256-l+Ds2wOqO+06E2aa//eAw9h+rKDLpjEhWKk0xHM/9CE=",
       "System.Net.Http.Json.wasm": "sha256-qR2Kv9wd9DigRa9gk00NOLikB8ExKq89h25FrE938k4=",
       "System.Net.Http.wasm": "sha256-+Axx0WLCJSj1QIGfErbz1/cDY79867q5bty0v4m2drU=",
@@ -59,7 +59,7 @@
       "System.Threading.wasm": "sha256-nDQEhXyEi1hXuAlcdl+JUHT1UdazXnoLqzw0gnLqOXM=",
       "System.wasm": "sha256-PUc71Jd5nvz5F65sAd0C3ZORcUzYK2JSfSDmE+Drn0Q=",
       "System.Private.CoreLib.wasm": "sha256-NmlkbJ8ZL4G1bNMWFks90PRWGX7pI3ZV5HYLJiFUi/w=",
-      "statistics_reports.wasm": "sha256-V11iM6bmt6mAbBdiAdaQmgTmHXA/tdKfpVcau8GIBHw="
+      "statistics_reports.wasm": "sha256-uj/CV1M+GzdqepxQX69+5xfWvh2XQH71vg7lMgx/pS8="
     }
   },
   "cacheBootResources": true,
