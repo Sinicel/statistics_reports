@@ -5,7 +5,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">statistics_reports</a>
+        <a class="navbar-brand" href="">Statistics & Reports</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -22,7 +22,7 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="workers">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span>  Работники
+                <span class="bi bi-bar-worker-fill-nav-menu" aria-hidden="true"></span>  Работники
             </NavLink>
         </div>
 
@@ -34,13 +34,13 @@
 
         <div class="nav-item px-3">
             <NavLink href="chart" class="nav-link">
-                <span class="bi bi-bar-chart-fill-nav-menu" aria-hidden="true"></span> 📈 График
+                <span class="bi bi-bar-chart-fill-nav-menu" aria-hidden="true"></span>  График
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink href="month-table" class="nav-link">
-                <span class="bi bi-table-nav-menu" aria-hidden="true"></span> Таблица
+                <span class="bi bi-bar-table-fill-nav-menu" aria-hidden="true"></span> Таблица
             </NavLink>
         </div>
 
@@ -48,8 +48,7 @@
         <div class="nav-item px-3">
             <a href="login"
                class="@AuthLinkClass"
-               @onclick:preventDefault="true" 
-               @onclick:stopPropagation="true" 
+               @onclick:preventDefault="true"
                @onclick="OnAuthLinkClicked">
                 <span class="@AuthIconClass" aria-hidden="true"></span> @AuthText
             </a>
@@ -84,8 +83,8 @@
 
     // Иконка
     private string AuthIconClass => SupabaseSession.IsAuthenticated
-        ? "bi bi-box-arrow-right-nav-menu"
-        : "bi bi-box-arrow-in-right-nav-menu";
+        ? "bi bi-box-logout-nav-menu"
+        : "bi bi-box-login-nav-menu";
 
     // Класс ссылки (цвет)
     private string AuthLinkClass => SupabaseSession.IsAuthenticated
