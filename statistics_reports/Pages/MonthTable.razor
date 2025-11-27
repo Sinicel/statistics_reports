@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using statistics_reports.Models
 @using statistics_reports.Services
+@using Microsoft.AspNetCore.Components
 
 @inject SupabaseClient SupabaseClient
 @inject SupabaseSession SupabaseSession
@@ -62,7 +63,10 @@
         <table class="table table-sm table-bordered align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Имя</th>
+                    <th @onclick="() => ChangeSort(SortColumn.Name)"
+    style="cursor: pointer; white-space: nowrap;">
+    Имя @GetSortIcon(SortColumn.Name)
+</th>
                     <th>Nr</th>
                     <th>Arbeitsplatz</th>
 
@@ -84,12 +88,16 @@
                         }
                     }
 
-                    <th class="text-center">Месяц</th>
+                    <th class="text-center"
+    @onclick="() => ChangeSort(SortColumn.Month)"
+    style="cursor: pointer; white-space: nowrap;">
+    Месяц @GetSortIcon(SortColumn.Month)
+</th>
                 </tr>
             </thead>
 
             <tbody>
-                @foreach (var row in Rows)
+                @foreach (var row in SortedRows)
                 {
                     <tr>
                         <td>@row.Worker.Name</td>
@@ -425,6 +433,76 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         return $"background-color: hsl({hue:F0}, 90%, 60%);";
     }
+
+
+        // --- СОРТИРОВКА ДЛЯ ТАБЛИЦЫ ---
+
+    // По какому полю сортируем
+    private enum SortColumn
+    {
+        Name,
+        Month
+    }
+
+    // Текущая колонка сортировки
+    private SortColumn CurrentSortColumn { get; set; } = SortColumn.Name;
+
+    // Текущий порядок: true = по возрастанию, false = по убыванию
+    private bool SortAscending { get; set; } = true;
+
+    // Отсортированный список строк
+    private IEnumerable<WorkerRowData> SortedRows
+    {
+        get
+        {
+            IEnumerable<WorkerRowData> query = Rows;
+
+            switch (CurrentSortColumn)
+            {
+                case SortColumn.Name:
+                    query = SortAscending
+                        ? Rows.OrderBy(r => r.Worker.Name)
+                        : Rows.OrderByDescending(r => r.Worker.Name);
+                    break;
+
+                case SortColumn.Month:
+                    // null-значения считаем "самыми маленькими"
+                    query = SortAscending
+                        ? Rows.OrderBy(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue)
+                        : Rows.OrderByDescending(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue);
+                    break;
+            }
+
+            return query;
+        }
+    }
+
+    // Смена сортировки при клике по заголовку
+    private void ChangeSort(SortColumn column)
+    {
+        if (CurrentSortColumn == column)
+        {
+            // Клик по той же колонке — меняем направление
+            SortAscending = !SortAscending;
+        }
+        else
+        {
+            // Клик по новой колонке — сортируем по возрастанию
+            CurrentSortColumn = column;
+            SortAscending = true;
+        }
+    }
+
+    // Маленькая стрелочка в заголовке (▲ / ▼)
+    private MarkupString GetSortIcon(SortColumn column)
+    {
+        if (CurrentSortColumn != column)
+            return new MarkupString(string.Empty);
+
+        var arrow = SortAscending ? "▲" : "▼";
+        return new MarkupString($"<span style='font-size:0.7rem; margin-left:4px;'>{arrow}</span>");
+    }
+
 
     // Вспомогательная модель для строки таблицы
     private class WorkerRowData

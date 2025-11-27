@@ -1,7 +1,10 @@
 ﻿@page "/statistics"
 
+@using System.Linq
 @using statistics_reports.Services
 @using statistics_reports.Models
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
 @inject SupabaseClient SupabaseClient
 @inject SupabaseSession SupabaseSession
 @inject NavigationManager Navigation
@@ -34,7 +37,7 @@ else
             <div class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Nr сотрудника</label>
-                    <input class="form-control"
+                    <input class="form-control" type="number"
                            @oninput="OnFilterWorkerNrInput"
                            value="@FilterWorkerNr" />
                 </div>
@@ -63,14 +66,14 @@ else
                 </div>
 
                 <div class="col-md-1 d-flex align-items-end">
-                    <button class="btn btn-primary w-100"  @onclick="OnApplyFilter">
+                    <button class="btn btn-primary w-100" @onclick="OnApplyFilter">
                         Применить
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    //style="background:#610152"
+
     <!-- ДОБАВИТЬ ЗАПИСЬ -->
     <div class="card mb-3">
         <div class="card-body">
@@ -79,7 +82,7 @@ else
             <div class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Nr сотрудника</label>
-                    <input class="form-control"
+                    <input class="form-control" type="number"
                            @oninput="OnNewWorkerNrInput"
                            value="@NewWorkerNr" />
                 </div>
@@ -90,7 +93,7 @@ else
                             value="@NewWorkerIdString"
                             @onchange="OnNewWorkerSelectChanged">
                         <option value="">-- выбрать --</option>
-                        @foreach (var w in WorkersList.Where(w=>w.IsActive==true))
+                        @foreach (var w in WorkersList.Where(w => w.IsActive == true))
                         {
                             <option value="@w.Id">@w.Name (@w.Nr)</option>
                         }
@@ -117,7 +120,6 @@ else
     </div>
 
     <!-- ТАБЛИЦА -->
-    
     @if (IsLoading)
     {
         <p>Загрузка статистики...</p>
@@ -128,36 +130,46 @@ else
     }
     else
     {
-        <table class="table table-striped table-sm">
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Работник</th>
-                    <th>Nr</th>
-                    <th>Arbeitsplatz</th>
-                    <th>Menge</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in StatisticsList)
-                {
-                    var worker = WorkersList.FirstOrDefault(w => w.Id == row.WorkerId);
+        <div class="table-responsive"> <!-- ДОБАВЛЕН ЗАКРЫВАЮЩИЙ ТЕГ -->
+            <table class="table table-striped table-sm">
+                <thead>
                     <tr>
-                        <td>@row.WorkDate.ToString("dd-MM-yyyy")</td>
-                        <td>@worker?.Name</td>
-                        <td>@worker?.Nr</td>
-                        <td>@worker?.Arbeitsplatz</td>
-                        <td>@row.Menge</td>
-
+                        <th @onclick="() => ChangeStatsSort(StatsSortColumn.Date)"
+                            style="cursor: pointer; white-space: nowrap;">
+                            Дата @GetStatsSortIcon(StatsSortColumn.Date)
+                        </th>
+                        <th @onclick="() => ChangeStatsSort(StatsSortColumn.Worker)"
+                            style="cursor: pointer; white-space: nowrap;">
+                            Работник @GetStatsSortIcon(StatsSortColumn.Worker)
+                        </th>
+                        <th>Nr</th>
+                        <th>Arbeitsplatz</th>
+                        <th @onclick="() => ChangeStatsSort(StatsSortColumn.Menge)"
+                            style="cursor: pointer; white-space: nowrap;">
+                            Menge @GetStatsSortIcon(StatsSortColumn.Menge)
+                        </th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var row in SortedStatistics)
+                    {
+                        var worker = WorkersList.FirstOrDefault(w => w.Id == row.WorkerId);
+                        <tr>
+                            <td>@row.WorkDate.ToString("dd-MM-yyyy")</td>
+                            <td>@worker?.Name</td>
+                            <td>@worker?.Nr</td>
+                            <td>@worker?.Arbeitsplatz</td>
+                            <td>@row.Menge</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div> <!-- ЗАКРЫТИЕ ТЕГА div -->
     }
-}
+} <!-- ЗАКРЫТИЕ БЛОКА else -->
 
-@code {
+@code
+{
     // ==== ДАННЫЕ ====
 
     // Список работников
@@ -200,12 +212,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
+
         // Поднимаем токен из localStorage
         await SupabaseSession.InitializeAsync();
         SessionChecked = true;
 
         if (!SupabaseSession.IsAuthenticated)
         {
+            IsLoading = false;
             return;
         }
 
@@ -219,17 +233,6 @@ else
         // Для формы добавления — сегодняшняя дата
         NewWorkDate = today;
 
-        // Если есть работники — выберем первого как дефолт
-        // if (WorkersList.Count > 0)
-        // {
-        //     var first = WorkersList[0];
-        //     FilterWorkerIdString = first.Id.ToString();
-        //     FilterWorkerNr = first.Nr;
-
-        //     NewWorkerIdString = first.Id.ToString();
-        //     NewWorkerNr = first.Nr;
-        // }
-       
         await LoadStatisticsAsync();
     }
 
@@ -240,10 +243,10 @@ else
         try
         {
             WorkersList = await SupabaseClient.GetWorkersAsync();
-            
         }
         catch (Exception ex)
         {
+            // при желании можно обработать JWT expired так же, как на других страницах
             ErrorMessage = $"Ошибка загрузки работников: {ex.Message}";
         }
     }
@@ -410,5 +413,78 @@ else
     private void GoToLogin()
     {
         Navigation.NavigateTo("/login");
+    }
+
+    // --- СОРТИРОВКА ДЛЯ СТАТИСТИКИ ---
+
+    private enum StatsSortColumn
+    {
+        Date,
+        Worker,
+        Menge
+    }
+
+    private StatsSortColumn CurrentStatsSort { get; set; } = StatsSortColumn.Date;
+    private bool StatsSortAscending { get; set; } = true;
+
+    // Отсортированный список для отображения
+    private IEnumerable<StatisticRow> SortedStatistics
+    {
+        get
+        {
+            IEnumerable<StatisticRow> query = StatisticsList;
+
+            switch (CurrentStatsSort)
+            {
+                case StatsSortColumn.Date:
+                    query = StatsSortAscending
+                        ? query.OrderBy(r => r.WorkDate)
+                        : query.OrderByDescending(r => r.WorkDate);
+                    break;
+
+                case StatsSortColumn.Worker:
+                    query = StatsSortAscending
+                        ? query.OrderBy(r => GetWorkerName(r.WorkerId))
+                        : query.OrderByDescending(r => GetWorkerName(r.WorkerId));
+                    break;
+
+                case StatsSortColumn.Menge:
+                    query = StatsSortAscending
+                        ? query.OrderBy(r => r.Menge)
+                        : query.OrderByDescending(r => r.Menge);
+                    break;
+            }
+
+            return query;
+        }
+    }
+
+    private void ChangeStatsSort(StatsSortColumn column)
+    {
+        if (CurrentStatsSort == column)
+        {
+            StatsSortAscending = !StatsSortAscending;
+        }
+        else
+        {
+            CurrentStatsSort = column;
+            StatsSortAscending = true;
+        }
+    }
+
+    private MarkupString GetStatsSortIcon(StatsSortColumn column)
+    {
+        if (CurrentStatsSort != column)
+            return new MarkupString(string.Empty);
+
+        var arrow = StatsSortAscending ? "▲" : "▼";
+        return new MarkupString($"{arrow}");
+    }
+
+    // Вспомогательный метод: вернуть имя работника по WorkerId
+    private string GetWorkerName(long workerId)
+    {
+        var worker = WorkersList.FirstOrDefault(w => w.Id == workerId);
+        return worker?.Name ?? string.Empty;
     }
 }
