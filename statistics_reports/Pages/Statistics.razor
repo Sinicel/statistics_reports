@@ -250,7 +250,7 @@ else
         catch (Exception ex)
         {
             // при желании можно обработать JWT expired так же, как на других страницах
-            ErrorMessage = $"Ошибка загрузки работников: {ex.Message}";
+            ErrorMessage = $"Statistics.razor-LoadWorkersAsync-Ошибка загрузки работников: {ex.Message}";
         }
     }
 
@@ -266,7 +266,7 @@ else
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Ошибка загрузки статистики: {ex.Message}";
+            ErrorMessage = $"Statistics.razor-LoadStatisticsAsync-Ошибка загрузки статистики: {ex.Message}";
         }
         finally
         {

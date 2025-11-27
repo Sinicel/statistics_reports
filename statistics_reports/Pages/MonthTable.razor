@@ -182,6 +182,16 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
     {
         ErrorMessage = null;
         IsBusy = true;
+
+        await SupabaseSession.InitializeAsync();
+
+        if (!SupabaseSession.IsAuthenticated)
+        {
+            ErrorMessage = "Вы не авторизованы. Пожалуйста, войдите в систему.";
+            // Navigation.NavigateTo("/login");
+            return;
+        }
+
         try
         {
             // Загружаем список работников

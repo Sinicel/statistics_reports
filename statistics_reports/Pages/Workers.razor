@@ -213,12 +213,29 @@ else
 
     private ConfirmModeType ConfirmMode { get; set; }
 
-    private bool IsBusy { get; set; }
+    
     private string? ErrorMessage { get; set; }
     private string? InfoMessage { get; set; }
+    // Флаги состояния
+    private bool SessionChecked { get; set; }
+    private bool IsBusy { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+
+        // 1. Поднимаем токен из localStorage
+        await SupabaseSession.InitializeAsync();
+
+        // 2. Если не авторизованы — не лезем в Supabase
+        if (!SupabaseSession.IsAuthenticated)
+        {
+            ErrorMessage = "Вы не авторизованы. Пожалуйста, войдите в систему.";
+            // Можно сразу отправлять на логин:
+            // Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // 3. Уже после этого грузим работников
         await LoadWorkersAsync();
     }
 

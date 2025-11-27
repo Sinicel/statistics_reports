@@ -87,7 +87,7 @@ namespace statistics_reports.Services
         public async Task<List<Worker>> GetWorkersAsync()
         {
             if (!_session.IsAuthenticated)
-                throw new Exception("Пользователь не авторизован.");
+                throw new Exception("SupabaseClient-Пользователь не авторизован.");
 
             ApplyAuthHeader();
 

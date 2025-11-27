@@ -92,6 +92,16 @@
     {
         ErrorMessage = null;
 
+        // 1. Поднять токен
+        await SupabaseSession.InitializeAsync();
+
+        if (!SupabaseSession.IsAuthenticated)
+        {
+            ErrorMessage = "Вы не авторизованы. Пожалуйста, войдите в систему.";
+            // Navigation.NavigateTo("/login");
+            return;
+        }
+
         try
         {
             // Загружаем список работников

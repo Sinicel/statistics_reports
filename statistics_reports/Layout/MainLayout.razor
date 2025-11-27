@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using statistics_reports.Services
+@using statistics_reports.Pages
+
+@inherits LayoutComponentBase
+@inject SupabaseSession SupabaseSession
 
 <PageTitle>Statistics Reports</PageTitle>
 
@@ -14,3 +18,17 @@
         </div>
     </main>
 </div>
+ @code {
+    private bool _sessionInitialized;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Инициализируем сессию один раз на всё приложение
+        if (!_sessionInitialized)
+        {
+            await SupabaseSession.InitializeAsync();
+            _sessionInitialized = true;
+        }
+    }
+} 
+ 

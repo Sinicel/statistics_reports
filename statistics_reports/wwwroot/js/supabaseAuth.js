@@ -14,5 +14,22 @@
     // Удалить токен (выход)
     clearToken: function () {
         localStorage.removeItem('supabase_access_token');
-    }
+    },
+
+    //supabaseAuth = {
+    //    setToken: function (token) {
+    //        console.log('setToken called', token ? 'HAS TOKEN' : 'NO TOKEN');
+    //        localStorage.setItem('supabaseToken', token);
+    //    },
+    //    getToken: function () {
+    //        const t = localStorage.getItem('supabaseToken');
+    //        console.log('getToken ->', t);
+    //        return t;
+    //    },
+    //    clearToken: function () {
+    //        console.log('clearToken');
+    //        localStorage.removeItem('supabaseToken');
+    //    }
+    //}
+
 }; 
