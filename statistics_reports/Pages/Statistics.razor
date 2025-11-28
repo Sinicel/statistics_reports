@@ -480,8 +480,8 @@ else
         if (CurrentStatsSort != column)
             return new MarkupString(string.Empty);
 
-        var arrow = StatsSortAscending ? "▲" : "▼";
-        return new MarkupString($"{arrow}");
+        var arrow = StatsSortAscending ? "&uarr;" : "&darr;";
+        return new MarkupString($"<span style='font-size:0.8rem; margin-left:4px;'>{arrow}</span>");
     }
 
     // Вспомогательный метод: вернуть имя работника по WorkerId
