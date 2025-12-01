@@ -8,11 +8,12 @@
 @inject SupabaseClient SupabaseClient
 @inject SupabaseSession SupabaseSession
 @inject NavigationManager Navigation
+@using System.ComponentModel.DataAnnotations;
 
 <h3>Статистика</h3>
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <div class="alert alert-danger">@ErrorMessage</div>
+    <div class="alert alert-danger">"1: " @ErrorMessage</div>
 }
 @if (!SessionChecked)
 {
@@ -27,10 +28,10 @@ else if (!SupabaseSession.IsAuthenticated)
 }
 else
 {
-    @if (!string.IsNullOrEmpty(ErrorMessage))
+ @*    @if (!string.IsNullOrEmpty(ErrorMessage))
     {
         <div class="alert alert-danger">@ErrorMessage</div>
-    }
+    } *@
 
     <!-- ФИЛЬТР -->
     <div class="card mb-3">
@@ -208,6 +209,8 @@ else
 
     // Дата и количество для новой записи
     private DateTime? NewWorkDate { get; set; }
+
+     // [Range(1, int.MaxValue, ErrorMessage = "Количество должно быть не меньше 1.")]
     private int? NewMenge { get; set; }
 
     // ==== ИНИЦИАЛИЗАЦИЯ ====
@@ -377,11 +380,12 @@ else
 
         var workerId = ParseLong(NewWorkerIdString);
 
-        if (workerId == null || NewWorkDate == null || NewMenge == null)
+        if (workerId == null || NewWorkDate == null || NewMenge == null || NewMenge < 1)
         {
-            ErrorMessage = "Выберите работника, дату и введите количество.";
+            ErrorMessage = "Выберите работника, дату и введите количество не меньше 1 .";
             return;
         }
+
 
         try
         {
@@ -389,9 +393,9 @@ else
             if (created != null)
             {
                 // Если запись попадает в текущий фильтр — можно добавить в список
-                StatisticsList.Add(created);
+               // StatisticsList.Add(created);
                 // Или можно полностью перезагрузить:
-                // await LoadStatisticsAsync();
+                 await LoadStatisticsAsync();
 
                 // Сбросим количество
                 NewMenge = null;

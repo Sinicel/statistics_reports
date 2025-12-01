@@ -356,6 +356,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
                     // —реднее за мес€ц: среднее по дневным суммам
                     var monthPerDay = daily.Values.ToList();
+                    
                     if (monthPerDay.Count > 0)
                     {
                         row.MonthAverage = monthPerDay.Average();

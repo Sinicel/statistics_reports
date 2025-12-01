@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-
 namespace statistics_reports.Models
 {
+
+   
+
+
     // Одна строка из таблицы statistics_table
     public class StatisticRow
     {
@@ -22,6 +25,7 @@ namespace statistics_reports.Models
 
         [JsonPropertyName("week_of_month")]
         public int WeekOfMonth { get; set; }
+
 
         [JsonPropertyName("menge")]
         public int Menge { get; set; }
