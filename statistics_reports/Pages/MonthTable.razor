@@ -9,6 +9,7 @@
 @inject SupabaseClient SupabaseClient
 @inject SupabaseSession SupabaseSession
 @inject NavigationManager Navigation
+@inject IJSRuntime Js
 
 <h3>Таблица по месяцам</h3>
 
@@ -18,38 +19,61 @@
 }
 
 <div class="row mb-3">
-    <div class="col-md-4 mb-2">
-        <label class="form-label">Работник</label>
-        <select class="form-select" @bind="SelectedWorkerId">
-            <option value="">Все</option>
-            @foreach (var worker in Workers)
-            {
-                <option value="@worker.Id">@worker.Name (@worker.Nr)</option>
-            }
-        </select>
+
+
+    <div class="row mb-3">
+        @* выбор месяца *@
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Месяц</label>
+            <InputText type="month"
+                       class="form-control"
+                       @bind-Value="SelectedMonth" />
+        </div>
+
+        @* выбор работника (если он у тебя есть) *@
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Работник</label>
+            <InputSelect class="form-select" @bind-Value="SelectedWorkerId">
+                <option value="">Все</option>
+                @foreach (var w in Workers) @* как у тебя называется список работников *@
+                {
+                    <option value="@w.Id">@w.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        @* НОВЫЙ фильтр по Arbeitsplаtz *@
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Arbeitsplatz</label>
+            <InputSelect class="form-select" @bind-Value="SelectedArbeitsplatz">
+                <option value="">Все</option>
+                @foreach (var place in Arbeitsplaetze)
+                {
+                    <option value="@place">@place</option>
+                }
+            </InputSelect>
+        </div>
+
+        @* кнопка "Показать" *@
+        <div class="col-md-3 mb-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" @onclick="LoadDataAsync">
+                Показать
+            </button>
+        </div>
+
+        <div class="row mb-3">
+            @* ... твои фильтры: месяц, работник, Arbeitsplatz ... *@
+
+            <div class="col-md-2 mb-2 d-flex align-items-end">
+                <button class="btn btn-secondary w-100"
+                        @onclick="PrintTable"
+                        disabled="@(!Rows.Any())">
+                    Распечатать таблицу
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-3 mb-2">
-        <label class="form-label">Месяц</label>
-        <InputText class="form-control"
-                   type="month"
-                   @bind-Value="SelectedMonth" />
-    </div>
-
-    <div class="col-md-2 mb-2 d-flex align-items-end">
-        <button class="btn btn-primary w-100"
-                @onclick="LoadDataAsync"
-                disabled="@IsBusy">
-            @if (IsBusy)
-            {
-                <span>Загружаем...</span>
-            }
-            else
-            {
-                <span>Показать</span>
-            }
-        </button>
-    </div>
 </div>
 
 @if (IsBusy && string.IsNullOrEmpty(ErrorMessage))
@@ -60,7 +84,7 @@
 @if (!IsBusy && WeekNumbers.Count > 0 && Rows.Count > 0)
 {
     <div class="table-responsive">
-        <table class="table table-sm table-bordered align-middle">
+        <table id="monthTable" class="table table-sm table-bordered align-middle">
             <thead class="table-light">
                 <tr>
                     <th @onclick="() => ChangeSort(SortColumn.Name)"
@@ -168,6 +192,12 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
     // Сопоставление "номер недели в месяце -> список дат этой недели"
     private Dictionary<int, List<DateTime>> DatesByWeek { get; set; } = new();
 
+    // Выбранный Arbeitsplatz (рабочее место) в фильтре
+    private string? SelectedArbeitsplatz { get; set; } = string.Empty;
+
+    // Список всех доступных рабочих мест для выбора в фильтре
+    private List<string> Arbeitsplaetze { get; set; } = new();
+
     // Сформированные строки для таблицы
     private List<WorkerRowData> Rows { get; set; } = new();
 
@@ -203,6 +233,18 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
             // Сразу грузим данные для "Все" за текущий месяц
             await LoadDataAsync();
+
+            var workers = await SupabaseClient.GetWorkersAsync();
+            var workersById = workers.ToDictionary(w => w.Id);
+
+            // Формируем список рабочих мест для выпадающего списка
+            Arbeitsplaetze = workers
+                .Select(w => w.Arbeitsplatz)
+                .Where(a => !string.IsNullOrWhiteSpace(a)) // исключаем пустые
+                .Distinct()
+                .OrderBy(a => a)
+                .ToList();
+
         }
         catch (Exception ex)
         {
@@ -292,16 +334,31 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                 .GroupBy(r => r.WorkerId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Кого показываем: либо всех, либо одного
-            IEnumerable<long> workerIdsToShow;
+            // Начинаем с полного списка работников
+            IEnumerable<Worker> workersToShow = workersById.Values;
+
+            // Фильтр по Arbeitsplatz, если выбран
+            if (!string.IsNullOrWhiteSpace(SelectedArbeitsplatz))
+            {
+                workersToShow = workersToShow
+                    .Where(w => string.Equals(
+                        w.Arbeitsplatz,
+                        SelectedArbeitsplatz,
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Фильтр по конкретному работнику (если выбран)
             if (SelectedWorkerId.HasValue)
             {
-                workerIdsToShow = new[] { SelectedWorkerId.Value };
+                workersToShow = workersToShow
+                    .Where(w => w.Id == SelectedWorkerId.Value);
             }
-            else
-            {
-                workerIdsToShow = workersById.Keys;
-            }
+
+            // Итоговый набор Id-ов работников, которых будем пытаться рисовать
+            var workerIdsToShow = workersToShow
+                .Select(w => w.Id)
+                .ToList();
+
 
             var rows = new List<WorkerRowData>();
 
@@ -362,7 +419,12 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.MonthAverage = monthPerDay.Average();
                     }
                 }
-
+                var hasNonEmptyDays = row.Daily.Values.Any(v => v > 0);
+                if(!hasNonEmptyDays)
+                {
+                    // Пропускаем строки без данных
+                    continue;
+                }
                 rows.Add(row);
             }
 
@@ -512,6 +574,12 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         var arrow = SortAscending ? "&uarr;" : "&darr;";
         return new MarkupString($"<span style='font-size:0.7rem; margin-left:4px;'>{arrow}</span>");
+    }
+
+    private async Task PrintTable()
+    {
+        // Вызываем JS-функцию, которая откроет отдельное окно и напечатает только таблицу
+        await Js.InvokeVoidAsync("monthTable.printTable", "monthTable");
     }
 
 
