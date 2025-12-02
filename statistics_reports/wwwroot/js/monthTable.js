@@ -1,41 +1,46 @@
-﻿// Глобальный объект для работы с печатью таблицы месяца
+// Утилита для печати только таблицы со всеми стилями/цветами
 window.monthTable = {
-    // Печать таблицы по её id
+    // Печать таблицы по id
     printTable: function (tableId) {
-        // Ищем таблицу на текущей странице
-        var table = document.getElementById(tableId);
+        const table = document.getElementById(tableId);
         if (!table) {
-            // Если таблица не найдена — на всякий случай печатаем текущую страницу
+            // Если не нашли таблицу — печатаем страницу как есть
             window.print();
             return;
         }
 
-        // Открываем новое окно
-        var win = window.open('', '_blank');
+        const win = window.open('', '_blank');
 
-        // Собираем ВСЕ <link rel="stylesheet"> из текущего документа
-        // (bootstrap, app.css, Statistics-Reports.styles.css и т.д.)
-        var stylesHtml = '';
+        // Подтягиваем все стили (<link rel="stylesheet">) из текущей страницы
+        let stylesHtml = '';
         document.querySelectorAll('link[rel="stylesheet"]').forEach(function (link) {
             stylesHtml += link.outerHTML;
         });
 
-        // Формируем HTML печатного окна
+        // Добавляем принт-правила, чтобы цвета сохранились при печати
+        const printStyles = `
+            <style>
+                @media print {
+                    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                }
+            </style>
+        `;
+
         win.document.write('<html><head><title>Печать таблицы</title>');
-        win.document.write(stylesHtml); // подключаем все те же стили, что и в основной странице
+        win.document.write(stylesHtml);
+        win.document.write(printStyles);
         win.document.write('</head><body>');
 
-        // Вставляем только таблицу (со всеми классами и b-атрибутами Blazor)
+        // Пишем только таблицу (без остальной страницы/JS)
         win.document.write(table.outerHTML);
 
         win.document.write('</body></html>');
         win.document.close();
         win.focus();
 
-        // Диалог печати
         win.print();
-
-        // Закрываем окно после печати (если не нужно — можно закомментировать)
         win.close();
     }
 };
