@@ -147,7 +147,7 @@
 
                             if (row.WeeklyAverage.TryGetValue(week, out var wavg))
                             {
-                                <td class="text-end bg-warning">
+                                <td class="text-center bg-warning" >
                                     @wavg.ToString("0")
                                 </td>
                             }
@@ -157,7 +157,7 @@
                             }
                         }
 
-                        <td class="text-end" style="@GetMonthCellStyle(row.MonthAverage)">
+                        <td class="text-center" style="@GetMonthCellStyle(row.MonthAverage)">
                             @(row.MonthAverage.HasValue? row.MonthAverage.Value.ToString("0") : "")
                         </td>
                     </tr>
