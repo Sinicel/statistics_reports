@@ -23,7 +23,13 @@ window.monthTable = {
                 @media print {
                     body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                     table { width: 100%; border-collapse: collapse; }
-                    th, td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    th, td {
+                        border: 1px solid #a7a8aaff;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                        text-align: center;
+                    }
+                    tr { border-bottom: 1px solid #a7a8aaff;}
                 }
             </style>
         `;
