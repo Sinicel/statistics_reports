@@ -1,4 +1,4 @@
-// Утилита для печати только таблицы со всеми стилями/цветами
+﻿// Утилита для печати только таблицы со всеми стилями/цветами
 window.monthTable = {
     // Печать таблицы по id
     printTable: function (tableId) {
@@ -27,7 +27,6 @@ window.monthTable = {
                         border: 1px solid #a7a8aaff;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
-                        text-align: center;
                     }
                     tr { border-bottom: 1px solid #a7a8aaff;}
                 }
@@ -43,10 +42,10 @@ window.monthTable = {
         win.document.write(table.outerHTML);
 
         win.document.write('</body></html>');
-        win.document.close();
+        //win.document.close();
         win.focus();
 
         win.print();
-        win.close();
+       //  win.close();
     }
 };

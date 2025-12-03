@@ -1,4 +1,4 @@
-@page "/month-table"
+п»ї@page "/month-table"
 
 @using System.Linq
 @using Microsoft.AspNetCore.Components.Forms
@@ -11,7 +11,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime Js
 
-<h3>Таблица по месяцам</h3>
+<h3>РўР°Р±Р»РёС†Р° РїРѕ РјРµСЃСЏС†Р°Рј</h3>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
@@ -22,31 +22,31 @@
 
 
     <div class="row mb-3">
-        @* выбор месяца *@
+        @* РІС‹Р±РѕСЂ РјРµСЃСЏС†Р° *@
         <div class="col-md-3 mb-2">
-            <label class="form-label">Месяц</label>
+            <label class="form-label">РњРµСЃСЏС†</label>
             <InputText type="month"
                        class="form-control"
                        @bind-Value="SelectedMonth" />
         </div>
 
-        @* выбор работника (если он у тебя есть) *@
+        @* РІС‹Р±РѕСЂ СЂР°Р±РѕС‚РЅРёРєР° (РµСЃР»Рё РѕРЅ Сѓ С‚РµР±СЏ РµСЃС‚СЊ) *@
         <div class="col-md-3 mb-2">
-            <label class="form-label">Работник</label>
+            <label class="form-label">Р Р°Р±РѕС‚РЅРёРє</label>
             <InputSelect class="form-select" @bind-Value="SelectedWorkerId">
-                <option value="">Все</option>
-                @foreach (var w in Workers) @* как у тебя называется список работников *@
+                <option value="">Р’СЃРµ</option>
+                @foreach (var w in Workers) @* РєР°Рє Сѓ С‚РµР±СЏ РЅР°Р·С‹РІР°РµС‚СЃСЏ СЃРїРёСЃРѕРє СЂР°Р±РѕС‚РЅРёРєРѕРІ *@
                 {
                     <option value="@w.Id">@w.Name</option>
                 }
             </InputSelect>
         </div>
 
-        @* НОВЫЙ фильтр по Arbeitsplаtz *@
+        @* РќРћР’Р«Р™ С„РёР»СЊС‚СЂ РїРѕ ArbeitsplР°tz *@
         <div class="col-md-3 mb-2">
             <label class="form-label">Arbeitsplatz</label>
             <InputSelect class="form-select" @bind-Value="SelectedArbeitsplatz">
-                <option value="">Все</option>
+                <option value="">Р’СЃРµ</option>
                 @foreach (var place in Arbeitsplaetze)
                 {
                     <option value="@place">@place</option>
@@ -54,21 +54,21 @@
             </InputSelect>
         </div>
 
-        @* кнопка "Показать" *@
+        @* РєРЅРѕРїРєР° "РџРѕРєР°Р·Р°С‚СЊ" *@
         <div class="col-md-3 mb-2 d-flex align-items-end">
             <button class="btn btn-primary w-100" @onclick="LoadDataAsync">
-                Показать
+                РџРѕРєР°Р·Р°С‚СЊ
             </button>
         </div>
 
         <div class="row mb-3">
-            @* ... твои фильтры: месяц, работник, Arbeitsplatz ... *@
+            @* ... С‚РІРѕРё С„РёР»СЊС‚СЂС‹: РјРµСЃСЏС†, СЂР°Р±РѕС‚РЅРёРє, Arbeitsplatz ... *@
 
             <div class="col-md-2 mb-2 d-flex align-items-end">
                 <button class="btn btn-secondary w-100"
                         @onclick="PrintTable"
                         disabled="@(!Rows.Any())">
-                    Распечатать таблицу
+                    Р Р°СЃРїРµС‡Р°С‚Р°С‚СЊ С‚Р°Р±Р»РёС†Сѓ
                 </button>
             </div>
         </div>
@@ -78,7 +78,7 @@
 
 @if (IsBusy && string.IsNullOrEmpty(ErrorMessage))
 {
-    <div>Загрузка данных...</div>
+    <div>Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</div>
 }
 
 @if (!IsBusy && WeekNumbers.Count > 0 && Rows.Count > 0)
@@ -89,12 +89,12 @@
                 <tr>
                     <th @onclick="() => ChangeSort(SortColumn.Name)"
                         style="cursor: pointer; white-space: nowrap;">
-                        Имя @GetSortIcon(SortColumn.Name)
+                        РРјСЏ @GetSortIcon(SortColumn.Name)
                     </th>
                     <th>Nr</th>
                     <th>Arbeitsplatz</th>
 
-                    @* Даты по неделям + среднее за неделю *@
+                    @* Р”Р°С‚С‹ РїРѕ РЅРµРґРµР»СЏРј + СЃСЂРµРґРЅРµРµ Р·Р° РЅРµРґРµР»СЋ *@
                     @foreach (var week in WeekNumbers)
                     {
                         if (DatesByWeek.TryGetValue(week, out var datesInWeek))
@@ -107,7 +107,7 @@
                             }
 
                             <th class="text-center bg-warning">
-                                Неделя @week
+                                РќРµРґРµР»СЏ @week
                             </th>
                         }
                     }
@@ -115,7 +115,7 @@
                     <th class="text-center"
     @onclick="() => ChangeSort(SortColumn.Month)"
                         style="width: 5%; cursor: pointer; white-space: nowrap;">
-    Месяц @GetSortIcon(SortColumn.Month)
+    РњРµСЃСЏС† @GetSortIcon(SortColumn.Month)
 </th>
                 </tr>
             </thead>
@@ -128,7 +128,7 @@
                         <td>@row.Worker.Nr</td>
                         <td>@row.Worker.Arbeitsplatz</td>
 
-                        @* Ячейки по дням + среднее за неделю *@
+                        @* РЇС‡РµР№РєРё РїРѕ РґРЅСЏРј + СЃСЂРµРґРЅРµРµ Р·Р° РЅРµРґРµР»СЋ *@
                         @foreach (var week in WeekNumbers)
                         {
                             var datesInWeek = DatesByWeek[week];
@@ -137,7 +137,7 @@
                             {
                                 if (row.Daily.TryGetValue(date, out var value))
                                 {
-                                    <td class="text-center">@value</td>
+                                    <td class="text-center" >@value</td>
                                 }
                                 else
                                 {
@@ -169,39 +169,39 @@
 else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-info">
-        За выбранный месяц данных нет.
+        Р—Р° РІС‹Р±СЂР°РЅРЅС‹Р№ РјРµСЃСЏС† РґР°РЅРЅС‹С… РЅРµС‚.
     </div>
 }
 
 @code {
-    // Список работников для фильтра
+    // РЎРїРёСЃРѕРє СЂР°Р±РѕС‚РЅРёРєРѕРІ РґР»СЏ С„РёР»СЊС‚СЂР°
     private List<Worker> Workers { get; set; } = new();
 
-    // Выбранный работник (null = "Все")
+    // Р’С‹Р±СЂР°РЅРЅС‹Р№ СЂР°Р±РѕС‚РЅРёРє (null = "Р’СЃРµ")
     private long? SelectedWorkerId { get; set; }
 
-    // Выбранный месяц (строка вида "yyyy-MM")
+    // Р’С‹Р±СЂР°РЅРЅС‹Р№ РјРµСЃСЏС† (СЃС‚СЂРѕРєР° РІРёРґР° "yyyy-MM")
     private string? SelectedMonth { get; set; }
 
-    // Даты, по которым есть данные в БД
+    // Р”Р°С‚С‹, РїРѕ РєРѕС‚РѕСЂС‹Рј РµСЃС‚СЊ РґР°РЅРЅС‹Рµ РІ Р‘Р”
     private List<DateTime> AllDates { get; set; } = new();
 
-    // Список номеров недель, которые реально есть (1..N)
+    // РЎРїРёСЃРѕРє РЅРѕРјРµСЂРѕРІ РЅРµРґРµР»СЊ, РєРѕС‚РѕСЂС‹Рµ СЂРµР°Р»СЊРЅРѕ РµСЃС‚СЊ (1..N)
     private List<int> WeekNumbers { get; set; } = new();
 
-    // Сопоставление "номер недели в месяце -> список дат этой недели"
+    // РЎРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ "РЅРѕРјРµСЂ РЅРµРґРµР»Рё РІ РјРµСЃСЏС†Рµ -> СЃРїРёСЃРѕРє РґР°С‚ СЌС‚РѕР№ РЅРµРґРµР»Рё"
     private Dictionary<int, List<DateTime>> DatesByWeek { get; set; } = new();
 
-    // Выбранный Arbeitsplatz (рабочее место) в фильтре
+    // Р’С‹Р±СЂР°РЅРЅС‹Р№ Arbeitsplatz (СЂР°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ) РІ С„РёР»СЊС‚СЂРµ
     private string? SelectedArbeitsplatz { get; set; } = string.Empty;
 
-    // Список всех доступных рабочих мест для выбора в фильтре
+    // РЎРїРёСЃРѕРє РІСЃРµС… РґРѕСЃС‚СѓРїРЅС‹С… СЂР°Р±РѕС‡РёС… РјРµСЃС‚ РґР»СЏ РІС‹Р±РѕСЂР° РІ С„РёР»СЊС‚СЂРµ
     private List<string> Arbeitsplaetze { get; set; } = new();
 
-    // Сформированные строки для таблицы
+    // РЎС„РѕСЂРјРёСЂРѕРІР°РЅРЅС‹Рµ СЃС‚СЂРѕРєРё РґР»СЏ С‚Р°Р±Р»РёС†С‹
     private List<WorkerRowData> Rows { get; set; } = new();
 
-    // Для градиента по месячному среднему
+    // Р”Р»СЏ РіСЂР°РґРёРµРЅС‚Р° РїРѕ РјРµСЃСЏС‡РЅРѕРјСѓ СЃСЂРµРґРЅРµРјСѓ
     private double? MonthMin { get; set; }
     private double? MonthMax { get; set; }
 
@@ -217,30 +217,30 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         if (!SupabaseSession.IsAuthenticated)
         {
-            ErrorMessage = "Вы не авторизованы. Пожалуйста, войдите в систему.";
+            ErrorMessage = "Р’С‹ РЅРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅС‹. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРѕР№РґРёС‚Рµ РІ СЃРёСЃС‚РµРјСѓ.";
             // Navigation.NavigateTo("/login");
             return;
         }
 
         try
         {
-            // Загружаем список работников
+            // Р—Р°РіСЂСѓР¶Р°РµРј СЃРїРёСЃРѕРє СЂР°Р±РѕС‚РЅРёРєРѕРІ
             Workers = await SupabaseClient.GetWorkersAsync();
 
-            // По умолчанию текущий месяц
+            // РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ С‚РµРєСѓС‰РёР№ РјРµСЃСЏС†
             var now = DateTime.Now;
             SelectedMonth = $"{now:yyyy-MM}";
 
-            // Сразу грузим данные для "Все" за текущий месяц
+            // РЎСЂР°Р·Сѓ РіСЂСѓР·РёРј РґР°РЅРЅС‹Рµ РґР»СЏ "Р’СЃРµ" Р·Р° С‚РµРєСѓС‰РёР№ РјРµСЃСЏС†
             await LoadDataAsync();
 
             var workers = await SupabaseClient.GetWorkersAsync();
             var workersById = workers.ToDictionary(w => w.Id);
 
-            // Формируем список рабочих мест для выпадающего списка
+            // Р¤РѕСЂРјРёСЂСѓРµРј СЃРїРёСЃРѕРє СЂР°Р±РѕС‡РёС… РјРµСЃС‚ РґР»СЏ РІС‹РїР°РґР°СЋС‰РµРіРѕ СЃРїРёСЃРєР°
             Arbeitsplaetze = workers
                 .Select(w => w.Arbeitsplatz)
-                .Where(a => !string.IsNullOrWhiteSpace(a)) // исключаем пустые
+                .Where(a => !string.IsNullOrWhiteSpace(a)) // РёСЃРєР»СЋС‡Р°РµРј РїСѓСЃС‚С‹Рµ
                 .Distinct()
                 .OrderBy(a => a)
                 .ToList();
@@ -250,17 +250,17 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
             {
-                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                ErrorMessage = "Р’СЂРµРјСЏ СЃРµСЃСЃРёРё РёСЃС‚РµРєР»Рѕ. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРѕР№РґРёС‚Рµ РІ СЃРёСЃС‚РµРјСѓ РµС‰С‘ СЂР°Р·.";
                 await SupabaseSession.ClearAsync();
                 Navigation.NavigateTo("/login", forceLoad: true);
                 return;
             }
 
-            ErrorMessage = $"Ошибка инициализации: {ex.Message}";
+            ErrorMessage = $"РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё: {ex.Message}";
         }
     }
 
-    // Основная загрузка таблицы по фильтрам
+    // РћСЃРЅРѕРІРЅР°СЏ Р·Р°РіСЂСѓР·РєР° С‚Р°Р±Р»РёС†С‹ РїРѕ С„РёР»СЊС‚СЂР°Рј
     private async Task LoadDataAsync()
     {
         ErrorMessage = null;
@@ -277,27 +277,27 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (string.IsNullOrWhiteSpace(SelectedMonth))
             {
-                ErrorMessage = "Выберите месяц.";
+                ErrorMessage = "Р’С‹Р±РµСЂРёС‚Рµ РјРµСЃСЏС†.";
                 return;
             }
 
             if (!TryParseMonth(SelectedMonth, out var fromDate, out var toDate))
             {
-                ErrorMessage = "Некорректный формат месяца.";
+                ErrorMessage = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ С„РѕСЂРјР°С‚ РјРµСЃСЏС†Р°.";
                 return;
             }
 
-            // Загружаем статистику за месяц (по всем или по одному работнику)
+            // Р—Р°РіСЂСѓР¶Р°РµРј СЃС‚Р°С‚РёСЃС‚РёРєСѓ Р·Р° РјРµСЃСЏС† (РїРѕ РІСЃРµРј РёР»Рё РїРѕ РѕРґРЅРѕРјСѓ СЂР°Р±РѕС‚РЅРёРєСѓ)
             var stats = await SupabaseClient.GetStatisticsAsync(fromDate, toDate, SelectedWorkerId);
 
             if (stats.Count == 0)
             {
-                return; // ErrorMessage не выставляем, просто "данных нет"
+                return; // ErrorMessage РЅРµ РІС‹СЃС‚Р°РІР»СЏРµРј, РїСЂРѕСЃС‚Рѕ "РґР°РЅРЅС‹С… РЅРµС‚"
             }
 
-            // ----- Даты и недели -----
+            // ----- Р”Р°С‚С‹ Рё РЅРµРґРµР»Рё -----
 
-            // Группируем по дате, упорядочиваем
+            // Р“СЂСѓРїРїРёСЂСѓРµРј РїРѕ РґР°С‚Рµ, СѓРїРѕСЂСЏРґРѕС‡РёРІР°РµРј
             var byDate = stats
                 .GroupBy(r => r.WorkDate.Date)
                 .OrderBy(g => g.Key)
@@ -305,7 +305,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
             AllDates = byDate.Select(g => g.Key).ToList();
 
-            // Сопоставление дата -> номер недели в месяце (берём из БД)
+            // РЎРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ РґР°С‚Р° -> РЅРѕРјРµСЂ РЅРµРґРµР»Рё РІ РјРµСЃСЏС†Рµ (Р±РµСЂС‘Рј РёР· Р‘Р”)
             var dateToWeek = byDate.ToDictionary(
                 g => g.Key,
                 g => g.Select(r => r.WeekOfMonth).FirstOrDefault()
@@ -316,7 +316,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                 .OrderBy(x => x)
                 .ToList();
 
-            // Заполняем "даты по неделям"
+            // Р—Р°РїРѕР»РЅСЏРµРј "РґР°С‚С‹ РїРѕ РЅРµРґРµР»СЏРј"
             DatesByWeek = WeekNumbers.ToDictionary(
                 week => week,
                 week => AllDates
@@ -324,20 +324,20 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                     .ToList()
             );
 
-            // ----- Подготовка строк по работникам -----
+            // ----- РџРѕРґРіРѕС‚РѕРІРєР° СЃС‚СЂРѕРє РїРѕ СЂР°Р±РѕС‚РЅРёРєР°Рј -----
 
-            // Для удобства: словарь WorkerId -> Worker
+            // Р”Р»СЏ СѓРґРѕР±СЃС‚РІР°: СЃР»РѕРІР°СЂСЊ WorkerId -> Worker
             var workersById = Workers.ToDictionary(w => w.Id);
 
-            // Группировка статистики по работнику
+            // Р“СЂСѓРїРїРёСЂРѕРІРєР° СЃС‚Р°С‚РёСЃС‚РёРєРё РїРѕ СЂР°Р±РѕС‚РЅРёРєСѓ
             var statsByWorker = stats
                 .GroupBy(r => r.WorkerId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Начинаем с полного списка работников
+            // РќР°С‡РёРЅР°РµРј СЃ РїРѕР»РЅРѕРіРѕ СЃРїРёСЃРєР° СЂР°Р±РѕС‚РЅРёРєРѕРІ
             IEnumerable<Worker> workersToShow = workersById.Values;
 
-            // Фильтр по Arbeitsplatz, если выбран
+            // Р¤РёР»СЊС‚СЂ РїРѕ Arbeitsplatz, РµСЃР»Рё РІС‹Р±СЂР°РЅ
             if (!string.IsNullOrWhiteSpace(SelectedArbeitsplatz))
             {
                 workersToShow = workersToShow
@@ -347,14 +347,14 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         StringComparison.OrdinalIgnoreCase));
             }
 
-            // Фильтр по конкретному работнику (если выбран)
+            // Р¤РёР»СЊС‚СЂ РїРѕ РєРѕРЅРєСЂРµС‚РЅРѕРјСѓ СЂР°Р±РѕС‚РЅРёРєСѓ (РµСЃР»Рё РІС‹Р±СЂР°РЅ)
             if (SelectedWorkerId.HasValue)
             {
                 workersToShow = workersToShow
                     .Where(w => w.Id == SelectedWorkerId.Value);
             }
 
-            // Итоговый набор Id-ов работников, которых будем пытаться рисовать
+            // РС‚РѕРіРѕРІС‹Р№ РЅР°Р±РѕСЂ Id-РѕРІ СЂР°Р±РѕС‚РЅРёРєРѕРІ, РєРѕС‚РѕСЂС‹С… Р±СѓРґРµРј РїС‹С‚Р°С‚СЊСЃСЏ СЂРёСЃРѕРІР°С‚СЊ
             var workerIdsToShow = workersToShow
                 .Select(w => w.Id)
                 .ToList();
@@ -374,7 +374,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
                 if (statsByWorker.TryGetValue(workerId, out var list))
                 {
-                    // Ежедневные значения: суммируем по (дата)
+                    // Р•Р¶РµРґРЅРµРІРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ: СЃСѓРјРјРёСЂСѓРµРј РїРѕ (РґР°С‚Р°)
                     var daily = list
                         .GroupBy(r => r.WorkDate.Date)
                         .ToDictionary(
@@ -387,15 +387,15 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.Daily[kv.Key] = kv.Value;
                     }
 
-                    // Средние по неделям:
-                    // берём (WeekOfMonth -> список дат) и внутри считаем среднее по дням
+                    // РЎСЂРµРґРЅРёРµ РїРѕ РЅРµРґРµР»СЏРј:
+                    // Р±РµСЂС‘Рј (WeekOfMonth -> СЃРїРёСЃРѕРє РґР°С‚) Рё РІРЅСѓС‚СЂРё СЃС‡РёС‚Р°РµРј СЃСЂРµРґРЅРµРµ РїРѕ РґРЅСЏРј
                     var weekly = list
                         .GroupBy(r => r.WeekOfMonth)
                         .ToDictionary(
                             g => g.Key,
                             g =>
                             {
-                                // по этой неделе группируем по дате, считаем сумму за день
+                                // РїРѕ СЌС‚РѕР№ РЅРµРґРµР»Рµ РіСЂСѓРїРїРёСЂСѓРµРј РїРѕ РґР°С‚Рµ, СЃС‡РёС‚Р°РµРј СЃСѓРјРјСѓ Р·Р° РґРµРЅСЊ
                                 var perDay = g
                                     .GroupBy(r => r.WorkDate.Date)
                                     .Select(dg => dg.Sum(r => r.Menge))
@@ -411,7 +411,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.WeeklyAverage[kv.Key] = kv.Value;
                     }
 
-                    // Среднее за месяц: среднее по дневным суммам
+                    // РЎСЂРµРґРЅРµРµ Р·Р° РјРµСЃСЏС†: СЃСЂРµРґРЅРµРµ РїРѕ РґРЅРµРІРЅС‹Рј СЃСѓРјРјР°Рј
                     var monthPerDay = daily.Values.ToList();
                     
                     if (monthPerDay.Count > 0)
@@ -422,7 +422,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                 var hasNonEmptyDays = row.Daily.Values.Any(v => v > 0);
                 if(!hasNonEmptyDays)
                 {
-                    // Пропускаем строки без данных
+                    // РџСЂРѕРїСѓСЃРєР°РµРј СЃС‚СЂРѕРєРё Р±РµР· РґР°РЅРЅС‹С…
                     continue;
                 }
                 rows.Add(row);
@@ -430,7 +430,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
             Rows = rows;
 
-            // ----- Градиент по месячной средней -----
+            // ----- Р“СЂР°РґРёРµРЅС‚ РїРѕ РјРµСЃСЏС‡РЅРѕР№ СЃСЂРµРґРЅРµР№ -----
 
             var monthValues = Rows
                 .Where(r => r.MonthAverage.HasValue)
@@ -447,13 +447,13 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
             {
-                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                ErrorMessage = "Р’СЂРµРјСЏ СЃРµСЃСЃРёРё РёСЃС‚РµРєР»Рѕ. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРѕР№РґРёС‚Рµ РІ СЃРёСЃС‚РµРјСѓ РµС‰С‘ СЂР°Р·.";
                 await SupabaseSession.ClearAsync();
                 Navigation.NavigateTo("/login", forceLoad: true);
                 return;
             }
 
-            ErrorMessage = $"Ошибка загрузки данных: {ex.Message}";
+            ErrorMessage = $"РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…: {ex.Message}";
         }
         finally
         {
@@ -461,7 +461,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         }
     }
 
-    // Разбор значения input type="month" (формат "yyyy-MM")
+    // Р Р°Р·Р±РѕСЂ Р·РЅР°С‡РµРЅРёСЏ input type="month" (С„РѕСЂРјР°С‚ "yyyy-MM")
     private bool TryParseMonth(string? monthValue, out DateTime fromDate, out DateTime toDate)
     {
         fromDate = default;
@@ -470,7 +470,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         if (string.IsNullOrWhiteSpace(monthValue))
             return false;
 
-        // "2025-11" -> берём 1 число месяца
+        // "2025-11" -> Р±РµСЂС‘Рј 1 С‡РёСЃР»Рѕ РјРµСЃСЏС†Р°
         if (!DateTime.TryParse($"{monthValue}-01", out var firstDay))
             return false;
 
@@ -481,7 +481,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         return true;
     }
 
-    // Стиль для ячейки "Месяц" с градиентом от красного к зелёному
+    // РЎС‚РёР»СЊ РґР»СЏ СЏС‡РµР№РєРё "РњРµСЃСЏС†" СЃ РіСЂР°РґРёРµРЅС‚РѕРј РѕС‚ РєСЂР°СЃРЅРѕРіРѕ Рє Р·РµР»С‘РЅРѕРјСѓ
     private string GetMonthCellStyle(double? value)
     {
         if (!value.HasValue || !MonthMin.HasValue || !MonthMax.HasValue)
@@ -493,7 +493,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         if (max <= min)
         {
-            // Все одинаковые значения — нейтральный жёлтый
+            // Р’СЃРµ РѕРґРёРЅР°РєРѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ вЂ” РЅРµР№С‚СЂР°Р»СЊРЅС‹Р№ Р¶С‘Р»С‚С‹Р№
             return "background-color: hsl(60, 90%, 60%);";
         }
 
@@ -501,29 +501,29 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         if (t < 0) t = 0;
         if (t > 1) t = 1;
 
-        // 0 -> красный (0°), 1 -> зелёный (120°)
+        // 0 -> РєСЂР°СЃРЅС‹Р№ (0В°), 1 -> Р·РµР»С‘РЅС‹Р№ (120В°)
         var hue = 0 + t * 120;
 
         return $"background-color: hsl({hue:F0}, 90%, 60%);";
     }
 
 
-        // --- СОРТИРОВКА ДЛЯ ТАБЛИЦЫ ---
+        // --- РЎРћР РўРР РћР’РљРђ Р”Р›РЇ РўРђР‘Р›РР¦Р« ---
 
-    // По какому полю сортируем
+    // РџРѕ РєР°РєРѕРјСѓ РїРѕР»СЋ СЃРѕСЂС‚РёСЂСѓРµРј
     private enum SortColumn
     {
         Name,
         Month
     }
 
-    // Текущая колонка сортировки
+    // РўРµРєСѓС‰Р°СЏ РєРѕР»РѕРЅРєР° СЃРѕСЂС‚РёСЂРѕРІРєРё
     private SortColumn CurrentSortColumn { get; set; } = SortColumn.Name;
 
-    // Текущий порядок: true = по возрастанию, false = по убыванию
+    // РўРµРєСѓС‰РёР№ РїРѕСЂСЏРґРѕРє: true = РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ, false = РїРѕ СѓР±С‹РІР°РЅРёСЋ
     private bool SortAscending { get; set; } = true;
 
-    // Отсортированный список строк
+    // РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ СЃРїРёСЃРѕРє СЃС‚СЂРѕРє
     private IEnumerable<WorkerRowData> SortedRows
     {
         get
@@ -539,7 +539,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                     break;
 
                 case SortColumn.Month:
-                    // null-значения считаем "самыми маленькими"
+                    // null-Р·РЅР°С‡РµРЅРёСЏ СЃС‡РёС‚Р°РµРј "СЃР°РјС‹РјРё РјР°Р»РµРЅСЊРєРёРјРё"
                     query = SortAscending
                         ? Rows.OrderBy(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue)
                         : Rows.OrderByDescending(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue);
@@ -550,23 +550,23 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         }
     }
 
-    // Смена сортировки при клике по заголовку
+    // РЎРјРµРЅР° СЃРѕСЂС‚РёСЂРѕРІРєРё РїСЂРё РєР»РёРєРµ РїРѕ Р·Р°РіРѕР»РѕРІРєСѓ
     private void ChangeSort(SortColumn column)
     {
         if (CurrentSortColumn == column)
         {
-            // Клик по той же колонке — меняем направление
+            // РљР»РёРє РїРѕ С‚РѕР№ Р¶Рµ РєРѕР»РѕРЅРєРµ вЂ” РјРµРЅСЏРµРј РЅР°РїСЂР°РІР»РµРЅРёРµ
             SortAscending = !SortAscending;
         }
         else
         {
-            // Клик по новой колонке — сортируем по возрастанию
+            // РљР»РёРє РїРѕ РЅРѕРІРѕР№ РєРѕР»РѕРЅРєРµ вЂ” СЃРѕСЂС‚РёСЂСѓРµРј РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ
             CurrentSortColumn = column;
             SortAscending = true;
         }
     }
 
-    // Маленькая стрелочка в заголовке (^ / Ў)
+    // РњР°Р»РµРЅСЊРєР°СЏ СЃС‚СЂРµР»РѕС‡РєР° РІ Р·Р°РіРѕР»РѕРІРєРµ (^ / РЋ)
     private MarkupString GetSortIcon(SortColumn column)
     {
         if (CurrentSortColumn != column)
@@ -578,24 +578,24 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
     private async Task PrintTable()
     {
-        // Вызываем JS-функцию, которая откроет отдельное окно и напечатает только таблицу
+        // Р’С‹Р·С‹РІР°РµРј JS-С„СѓРЅРєС†РёСЋ, РєРѕС‚РѕСЂР°СЏ РѕС‚РєСЂРѕРµС‚ РѕС‚РґРµР»СЊРЅРѕРµ РѕРєРЅРѕ Рё РЅР°РїРµС‡Р°С‚Р°РµС‚ С‚РѕР»СЊРєРѕ С‚Р°Р±Р»РёС†Сѓ
         await Js.InvokeVoidAsync("monthTable.printTable", "monthTable");
     }
 
 
-    // Вспомогательная модель для строки таблицы
+    // Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ РјРѕРґРµР»СЊ РґР»СЏ СЃС‚СЂРѕРєРё С‚Р°Р±Р»РёС†С‹
     private class WorkerRowData
     {
-        // Сам работник
+        // РЎР°Рј СЂР°Р±РѕС‚РЅРёРє
         public Worker Worker { get; set; } = default!;
 
-        // Значения по дням: дата -> сумма Menge
+        // Р—РЅР°С‡РµРЅРёСЏ РїРѕ РґРЅСЏРј: РґР°С‚Р° -> СЃСѓРјРјР° Menge
         public Dictionary<DateTime, int> Daily { get; } = new();
 
-        // Среднее по неделям: номер недели -> среднее Menge
+        // РЎСЂРµРґРЅРµРµ РїРѕ РЅРµРґРµР»СЏРј: РЅРѕРјРµСЂ РЅРµРґРµР»Рё -> СЃСЂРµРґРЅРµРµ Menge
         public Dictionary<int, double> WeeklyAverage { get; } = new();
 
-        // Среднее за месяц по дням
+        // РЎСЂРµРґРЅРµРµ Р·Р° РјРµСЃСЏС† РїРѕ РґРЅСЏРј
         public double? MonthAverage { get; set; }
     }
 }
