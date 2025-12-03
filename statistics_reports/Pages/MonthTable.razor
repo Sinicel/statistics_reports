@@ -419,7 +419,8 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.MonthAverage = monthPerDay.Average();
                     }
                 }
-                var hasNonEmptyDays = row.Daily.Values.Any(v => v > 0);
+                var hasNonEmptyDays = row.Daily.Values.Any(v => v >= 0);
+
                 if(!hasNonEmptyDays)
                 {
                     // Пропускаем строки без данных
