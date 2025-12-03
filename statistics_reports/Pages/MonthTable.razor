@@ -225,7 +225,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         try
         {
             // Загружаем список работников
-            Workers = await SupabaseClient.GetWorkersAsync();
+             Workers = await SupabaseClient.GetWorkersAsync();
 
             // По умолчанию текущий месяц
             var now = DateTime.Now;
