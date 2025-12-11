@@ -11,7 +11,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime Js
 
-<h3>Таблица по месяцам</h3>
+<h3>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</h3>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
@@ -22,31 +22,31 @@
 
 
     <div class="row mb-3">
-        @* выбор месяца *@
+        @* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ *@
         <div class="col-md-3 mb-2">
-            <label class="form-label">Месяц</label>
+            <label class="form-label">пїЅпїЅпїЅпїЅпїЅ</label>
             <InputText type="month"
                        class="form-control"
                        @bind-Value="SelectedMonth" />
         </div>
 
-        @* выбор работника (если он у тебя есть) *@
+        @* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ) *@
         <div class="col-md-3 mb-2">
-            <label class="form-label">Работник</label>
+            <label class="form-label">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</label>
             <InputSelect class="form-select" @bind-Value="SelectedWorkerId">
-                <option value="">Все</option>
-                @foreach (var w in Workers) @* как у тебя называется список работников *@
+                <option value="">пїЅпїЅпїЅ</option>
+                @foreach (var w in Workers) @* пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ *@
                 {
                     <option value="@w.Id">@w.Name</option>
                 }
             </InputSelect>
         </div>
 
-        @* НОВЫЙ фильтр по Arbeitsplаtz *@
+        @* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ ArbeitsplпїЅtz *@
         <div class="col-md-3 mb-2">
             <label class="form-label">Arbeitsplatz</label>
             <InputSelect class="form-select" @bind-Value="SelectedArbeitsplatz">
-                <option value="">Все</option>
+                <option value="">пїЅпїЅпїЅ</option>
                 @foreach (var place in Arbeitsplaetze)
                 {
                     <option value="@place">@place</option>
@@ -54,21 +54,21 @@
             </InputSelect>
         </div>
 
-        @* кнопка "Показать" *@
+        @* пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" *@
         <div class="col-md-3 mb-2 d-flex align-items-end">
             <button class="btn btn-primary w-100" @onclick="LoadDataAsync">
-                Показать
+                пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             </button>
         </div>
 
         <div class="row mb-3">
-            @* ... твои фильтры: месяц, работник, Arbeitsplatz ... *@
+            @* ... пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, Arbeitsplatz ... *@
 
             <div class="col-md-2 mb-2 d-flex align-items-end">
                 <button class="btn btn-secondary w-100"
                         @onclick="PrintTable"
                         disabled="@(!Rows.Any())">
-                    Распечатать таблицу
+                    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 </button>
             </div>
         </div>
@@ -78,7 +78,7 @@
 
 @if (IsBusy && string.IsNullOrEmpty(ErrorMessage))
 {
-    <div>Загрузка данных...</div>
+    <div>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ...</div>
 }
 
 @if (!IsBusy && WeekNumbers.Count > 0 && Rows.Count > 0)
@@ -89,12 +89,12 @@
                 <tr>
                     <th @onclick="() => ChangeSort(SortColumn.Name)"
                         style="cursor: pointer; white-space: nowrap;">
-                        Имя @GetSortIcon(SortColumn.Name)
+                        пїЅпїЅпїЅ @GetSortIcon(SortColumn.Name)
                     </th>
                     <th>Nr</th>
                     <th>Arbeitsplatz</th>
 
-                    @* Даты по неделям + среднее за неделю *@
+                    @* пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ *@
                     @foreach (var week in WeekNumbers)
                     {
                         if (DatesByWeek.TryGetValue(week, out var datesInWeek))
@@ -107,7 +107,7 @@
                             }
 
                             <th class="text-center bg-warning">
-                                Неделя @week
+                                пїЅпїЅпїЅпїЅпїЅпїЅ @week
                             </th>
                         }
                     }
@@ -115,7 +115,7 @@
                     <th class="text-center"
     @onclick="() => ChangeSort(SortColumn.Month)"
                         style="width: 5%; cursor: pointer; white-space: nowrap;">
-    Месяц @GetSortIcon(SortColumn.Month)
+    пїЅпїЅпїЅпїЅпїЅ @GetSortIcon(SortColumn.Month)
 </th>
                 </tr>
             </thead>
@@ -128,7 +128,7 @@
                         <td>@row.Worker.Nr</td>
                         <td>@row.Worker.Arbeitsplatz</td>
 
-                        @* Ячейки по дням + среднее за неделю *@
+                        @* пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ *@
                         @foreach (var week in WeekNumbers)
                         {
                             var datesInWeek = DatesByWeek[week];
@@ -169,39 +169,39 @@
 else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-info">
-        За выбранный месяц данных нет.
+        пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ.
     </div>
 }
 
 @code {
-    // Список работников для фильтра
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private List<Worker> Workers { get; set; } = new();
 
-    // Выбранный работник (null = "Все")
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (null = "пїЅпїЅпїЅ")
     private long? SelectedWorkerId { get; set; }
 
-    // Выбранный месяц (строка вида "yyyy-MM")
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ "yyyy-MM")
     private string? SelectedMonth { get; set; }
 
-    // Даты, по которым есть данные в БД
+    // пїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
     private List<DateTime> AllDates { get; set; } = new();
 
-    // Список номеров недель, которые реально есть (1..N)
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (1..N)
     private List<int> WeekNumbers { get; set; } = new();
 
-    // Сопоставление "номер недели в месяце -> список дат этой недели"
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ -> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"
     private Dictionary<int, List<DateTime>> DatesByWeek { get; set; } = new();
 
-    // Выбранный Arbeitsplatz (рабочее место) в фильтре
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Arbeitsplatz (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private string? SelectedArbeitsplatz { get; set; } = string.Empty;
 
-    // Список всех доступных рабочих мест для выбора в фильтре
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private List<string> Arbeitsplaetze { get; set; } = new();
 
-    // Сформированные строки для таблицы
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private List<WorkerRowData> Rows { get; set; } = new();
 
-    // Для градиента по месячному среднему
+    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private double? MonthMin { get; set; }
     private double? MonthMax { get; set; }
 
@@ -217,30 +217,30 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         if (!SupabaseSession.IsAuthenticated)
         {
-            ErrorMessage = "Вы не авторизованы. Пожалуйста, войдите в систему.";
+            ErrorMessage = "пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.";
             // Navigation.NavigateTo("/login");
             return;
         }
 
         try
         {
-            // Загружаем список работников
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             Workers = await SupabaseClient.GetWorkersAsync();
 
-            // По умолчанию текущий месяц
+            // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             var now = DateTime.Now;
             SelectedMonth = $"{now:yyyy-MM}";
 
-            // Сразу грузим данные для "Все" за текущий месяц
+            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ "пїЅпїЅпїЅ" пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             await LoadDataAsync();
 
             var workers = await SupabaseClient.GetWorkersAsync();
             var workersById = workers.ToDictionary(w => w.Id);
 
-            // Формируем список рабочих мест для выпадающего списка
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             Arbeitsplaetze = workers
                 .Select(w => w.Arbeitsplatz)
-                .Where(a => !string.IsNullOrWhiteSpace(a)) // исключаем пустые
+                .Where(a => !string.IsNullOrWhiteSpace(a)) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                 .Distinct()
                 .OrderBy(a => a)
                 .ToList();
@@ -250,17 +250,17 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
             {
-                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                ErrorMessage = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ.";
                 await SupabaseSession.ClearAsync();
                 Navigation.NavigateTo("/login", forceLoad: true);
                 return;
             }
 
-            ErrorMessage = $"Ошибка инициализации: {ex.Message}";
+            ErrorMessage = $"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: {ex.Message}";
         }
     }
 
-    // Основная загрузка таблицы по фильтрам
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private async Task LoadDataAsync()
     {
         ErrorMessage = null;
@@ -277,27 +277,27 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (string.IsNullOrWhiteSpace(SelectedMonth))
             {
-                ErrorMessage = "Выберите месяц.";
+                ErrorMessage = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.";
                 return;
             }
 
             if (!TryParseMonth(SelectedMonth, out var fromDate, out var toDate))
             {
-                ErrorMessage = "Некорректный формат месяца.";
+                ErrorMessage = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.";
                 return;
             }
 
-            // Загружаем статистику за месяц (по всем или по одному работнику)
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
             var stats = await SupabaseClient.GetStatisticsAsync(fromDate, toDate, SelectedWorkerId);
 
             if (stats.Count == 0)
             {
-                return; // ErrorMessage не выставляем, просто "данных нет"
+                return; // ErrorMessage пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ"
             }
 
-            // ----- Даты и недели -----
+            // ----- пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ -----
 
-            // Группируем по дате, упорядочиваем
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var byDate = stats
                 .GroupBy(r => r.WorkDate.Date)
                 .OrderBy(g => g.Key)
@@ -305,7 +305,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
             AllDates = byDate.Select(g => g.Key).ToList();
 
-            // Сопоставление дата -> номер недели в месяце (берём из БД)
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ -> пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ)
             var dateToWeek = byDate.ToDictionary(
                 g => g.Key,
                 g => g.Select(r => r.WeekOfMonth).FirstOrDefault()
@@ -316,7 +316,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                 .OrderBy(x => x)
                 .ToList();
 
-            // Заполняем "даты по неделям"
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
             DatesByWeek = WeekNumbers.ToDictionary(
                 week => week,
                 week => AllDates
@@ -324,20 +324,20 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                     .ToList()
             );
 
-            // ----- Подготовка строк по работникам -----
+            // ----- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ -----
 
-            // Для удобства: словарь WorkerId -> Worker
+            // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ WorkerId -> Worker
             var workersById = Workers.ToDictionary(w => w.Id);
 
-            // Группировка статистики по работнику
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var statsByWorker = stats
                 .GroupBy(r => r.WorkerId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Начинаем с полного списка работников
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             IEnumerable<Worker> workersToShow = workersById.Values;
 
-            // Фильтр по Arbeitsplatz, если выбран
+            // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Arbeitsplatz, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             if (!string.IsNullOrWhiteSpace(SelectedArbeitsplatz))
             {
                 workersToShow = workersToShow
@@ -347,14 +347,14 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         StringComparison.OrdinalIgnoreCase));
             }
 
-            // Фильтр по конкретному работнику (если выбран)
+            // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
             if (SelectedWorkerId.HasValue)
             {
                 workersToShow = workersToShow
                     .Where(w => w.Id == SelectedWorkerId.Value);
             }
 
-            // Итоговый набор Id-ов работников, которых будем пытаться рисовать
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ Id-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             var workerIdsToShow = workersToShow
                 .Select(w => w.Id)
                 .ToList();
@@ -374,7 +374,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
                 if (statsByWorker.TryGetValue(workerId, out var list))
                 {
-                    // Ежедневные значения: суммируем по (дата)
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ (пїЅпїЅпїЅпїЅ)
                     var daily = list
                         .GroupBy(r => r.WorkDate.Date)
                         .ToDictionary(
@@ -387,15 +387,15 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.Daily[kv.Key] = kv.Value;
                     }
 
-                    // Средние по неделям:
-                    // берём (WeekOfMonth -> список дат) и внутри считаем среднее по дням
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
+                    // пїЅпїЅпїЅпїЅ (WeekOfMonth -> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
                     var weekly = list
                         .GroupBy(r => r.WeekOfMonth)
                         .ToDictionary(
                             g => g.Key,
                             g =>
                             {
-                                // по этой неделе группируем по дате, считаем сумму за день
+                                // пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
                                 var perDay = g
                                     .GroupBy(r => r.WorkDate.Date)
                                     .Select(dg => dg.Sum(r => r.Menge))
@@ -411,7 +411,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                         row.WeeklyAverage[kv.Key] = kv.Value;
                     }
 
-                    // Среднее за месяц: среднее по дневным суммам
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     var monthPerDay = daily.Values.ToList();
                     
                     if (monthPerDay.Count > 0)
@@ -422,7 +422,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                 var hasNonEmptyDays = row.Daily.Values.Any(v => v > 0);
                 if(!hasNonEmptyDays)
                 {
-                    // Пропускаем строки без данных
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     continue;
                 }
                 rows.Add(row);
@@ -430,7 +430,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
             Rows = rows;
 
-            // ----- Градиент по месячной средней -----
+            // ----- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ -----
 
             var monthValues = Rows
                 .Where(r => r.MonthAverage.HasValue)
@@ -447,13 +447,13 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         {
             if (ex.Message.Contains("JWT expired", StringComparison.OrdinalIgnoreCase))
             {
-                ErrorMessage = "Время сессии истекло. Пожалуйста, войдите в систему ещё раз.";
+                ErrorMessage = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ.";
                 await SupabaseSession.ClearAsync();
                 Navigation.NavigateTo("/login", forceLoad: true);
                 return;
             }
 
-            ErrorMessage = $"Ошибка загрузки данных: {ex.Message}";
+            ErrorMessage = $"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: {ex.Message}";
         }
         finally
         {
@@ -461,7 +461,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         }
     }
 
-    // Разбор значения input type="month" (формат "yyyy-MM")
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ input type="month" (пїЅпїЅпїЅпїЅпїЅпїЅ "yyyy-MM")
     private bool TryParseMonth(string? monthValue, out DateTime fromDate, out DateTime toDate)
     {
         fromDate = default;
@@ -470,7 +470,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         if (string.IsNullOrWhiteSpace(monthValue))
             return false;
 
-        // "2025-11" -> берём 1 число месяца
+        // "2025-11" -> пїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         if (!DateTime.TryParse($"{monthValue}-01", out var firstDay))
             return false;
 
@@ -481,7 +481,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         return true;
     }
 
-    // Стиль для ячейки "Месяц" с градиентом от красного к зелёному
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private string GetMonthCellStyle(double? value)
     {
         if (!value.HasValue || !MonthMin.HasValue || !MonthMax.HasValue)
@@ -493,7 +493,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
         if (max <= min)
         {
-            // Все одинаковые значения — нейтральный жёлтый
+            // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             return "background-color: hsl(60, 90%, 60%);";
         }
 
@@ -501,29 +501,29 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         if (t < 0) t = 0;
         if (t > 1) t = 1;
 
-        // 0 -> красный (0°), 1 -> зелёный (120°)
+        // 0 -> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (0пїЅ), 1 -> пїЅпїЅпїЅпїЅпїЅпїЅ (120пїЅ)
         var hue = 0 + t * 120;
 
         return $"background-color: hsl({hue:F0}, 90%, 60%);";
     }
 
 
-        // --- СОРТИРОВКА ДЛЯ ТАБЛИЦЫ ---
+        // --- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ---
 
-    // По какому полю сортируем
+    // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private enum SortColumn
     {
         Name,
         Month
     }
 
-    // Текущая колонка сортировки
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private SortColumn CurrentSortColumn { get; set; } = SortColumn.Name;
 
-    // Текущий порядок: true = по возрастанию, false = по убыванию
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: true = пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, false = пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private bool SortAscending { get; set; } = true;
 
-    // Отсортированный список строк
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     private IEnumerable<WorkerRowData> SortedRows
     {
         get
@@ -539,7 +539,7 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
                     break;
 
                 case SortColumn.Month:
-                    // null-значения считаем "самыми маленькими"
+                    // null-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
                     query = SortAscending
                         ? Rows.OrderBy(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue)
                         : Rows.OrderByDescending(r => r.MonthAverage.HasValue ? r.MonthAverage.Value : double.MinValue);
@@ -550,23 +550,23 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
         }
     }
 
-    // Смена сортировки при клике по заголовку
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private void ChangeSort(SortColumn column)
     {
         if (CurrentSortColumn == column)
         {
-            // Клик по той же колонке — меняем направление
+            // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             SortAscending = !SortAscending;
         }
         else
         {
-            // Клик по новой колонке — сортируем по возрастанию
+            // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             CurrentSortColumn = column;
             SortAscending = true;
         }
     }
 
-    // Маленькая стрелочка в заголовке (^ / Ў)
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (^ / пїЅ)
     private MarkupString GetSortIcon(SortColumn column)
     {
         if (CurrentSortColumn != column)
@@ -578,24 +578,24 @@ else if (!IsBusy && WeekNumbers.Count == 0 && string.IsNullOrEmpty(ErrorMessage)
 
     private async Task PrintTable()
     {
-        // Вызываем JS-функцию, которая откроет отдельное окно и напечатает только таблицу
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ JS-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         await Js.InvokeVoidAsync("monthTable.printTable", "monthTable");
     }
 
 
-    // Вспомогательная модель для строки таблицы
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     private class WorkerRowData
     {
-        // Сам работник
+        // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         public Worker Worker { get; set; } = default!;
 
-        // Значения по дням: дата -> сумма Menge
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅ -> пїЅпїЅпїЅпїЅпїЅ Menge
         public Dictionary<DateTime, int> Daily { get; } = new();
 
-        // Среднее по неделям: номер недели -> среднее Menge
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ -> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Menge
         public Dictionary<int, double> WeeklyAverage { get; } = new();
 
-        // Среднее за месяц по дням
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
         public double? MonthAverage { get; set; }
     }
 }
