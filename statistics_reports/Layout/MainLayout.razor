@@ -1,5 +1,11 @@
 ﻿@using statistics_reports.Services
 @using statistics_reports.Pages
+@using System.ComponentModel;
+@using System.Linq
+@using statistics_reports.Models
+@inject SupabaseClient SupabaseClient
+@inject SupabaseSession SupabaseSession
+@inject NavigationManager Navigation
 
 @inherits LayoutComponentBase
 @inject SupabaseSession SupabaseSession
@@ -14,6 +20,7 @@
     <main>
         <div class="main-content px-4">
             @* Здесь будет показываться содержимое конкретной страницы *@
+            
             @Body
         </div>
     </main>
